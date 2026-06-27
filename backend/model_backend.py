@@ -129,14 +129,35 @@ def truncate_at_stop_sequence(text: str) -> str:
 
 
 def clean_completion(text: str) -> str:
-    text = text.replace("Ċ", "\n").replace("Ġ", " ")  # ← add this
-    text = text.strip()
-    fence_match = _FENCE_RE.search(text)
-    if fence_match:
-        text = fence_match.group(1).strip()
+    text = text.replace("Ċ", "\n").replace("Ġ", " ").strip()
+
+    m = _FENCE_RE.search(text)
+    if m:
+        text = m.group(1).strip()
     else:
         text = _PREAMBLE_RE.sub("", text, count=1).strip()
-    return truncate_at_stop_sequence(text)
+
+    clean = re.sub(r"```[a-zA-Z]*\n?", "", text).replace("```", "").strip()
+    for line in clean.splitlines():
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        if not re.search(r"[\w\.]+\s*\(", s):
+            continue
+        depth, cut, found = 0, len(s), False
+        for i, ch in enumerate(s):
+            if ch == "(": depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    cut = i + 1; found = True; break
+        if not found:
+            continue
+        result = re.sub(r"^[^a-zA-Z_]+", "", s[:cut].strip()).strip()
+        if result:
+            return result
+
+    return clean.split("\n")[0].strip()
 
 
 # --- Generation --------------------------------------------------------------
