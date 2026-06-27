@@ -181,5 +181,6 @@ def generate(
     )
 
     completion_ids = output[0][input_ids.shape[1]:]
-    text = tokenizer.decode(completion_ids, skip_special_tokens=True)
+    text = tokenizer.decode(completion_ids, skip_special_tokens=True,
+                        clean_up_tokenization_spaces=True)
     return clean_completion(text)
