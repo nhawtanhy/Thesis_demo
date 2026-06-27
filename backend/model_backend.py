@@ -118,7 +118,7 @@ _PREAMBLE_RE = re.compile(
 # harness. Base models especially will keep going for the full token budget
 # with no natural stopping point unless cut off here. Add more patterns if
 # you see a model wander off in a different direction.
-_STOP_SEQUENCES = ["\ndef ", "\nclass ", "\nif __name__", "\n\n\n"]
+_STOP_SEQUENCES = ["\ndef ", "\nclass ", "\nif __name__", "\n\n\n", "\n\n"]
 
 
 def truncate_at_stop_sequence(text: str) -> str:

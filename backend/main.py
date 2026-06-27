@@ -41,7 +41,7 @@ class CompletionRequest(BaseModel):
     prefix: str
     suffix: str = ""
     model_key: str = model_backend.DEFAULT_MODEL_KEY
-    max_tokens: int = 128
+    max_tokens: int = 40
 
 
 class CompletionResponse(BaseModel):
@@ -95,7 +95,7 @@ def complete(req: CompletionRequest):
         prefix=req.prefix,
         suffix=req.suffix,
         model_key=req.model_key,
-        max_new_tokens=req.max_tokens,
+        max_new_tokens=min(req.max_tokens, 40),
     )
     return CompletionResponse(completion=completion)
 
