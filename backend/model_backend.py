@@ -155,11 +155,17 @@ def generate(
     prompt_text = build_prompt(prefix, context, is_instruct=cfg["is_instruct"])
 
     if cfg["is_instruct"]:
-        messages = [{"role": "user", "content": prompt_text}]
-        input_ids = tokenizer.apply_chat_template(
-            messages, return_tensors="pt", add_generation_prompt=True
-        ).to(DEVICE)
-        attention_mask = torch.ones_like(input_ids)
+        encoded = tokenizer.apply_chat_template(
+            [{"role": "user", "content": prompt_text}],
+            return_tensors="pt", add_generation_prompt=True
+        )
+        # newer transformers returns BatchEncoding, older returns plain tensor
+        if hasattr(encoded, 'input_ids'):
+            input_ids = encoded.input_ids.to(DEVICE)
+            attention_mask = encoded.attention_mask.to(DEVICE)
+        else:
+            input_ids = encoded.to(DEVICE)
+            attention_mask = torch.ones_like(input_ids)
     else:
         encoded = tokenizer(prompt_text, return_tensors="pt").to(DEVICE)
         input_ids = encoded.input_ids
