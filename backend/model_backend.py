@@ -129,6 +129,7 @@ def truncate_at_stop_sequence(text: str) -> str:
 
 
 def clean_completion(text: str) -> str:
+    text = text.replace("Ġ", " ").replace("Ċ", "\n")  # ← add this
     text = text.strip()
     fence_match = _FENCE_RE.search(text)
     if fence_match:
