@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>{% block title %}DUR Completion{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+{% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+
+<header class="topnav">
+  <a href="/" class="logo">DUR<span>·completion</span></a>
+  <nav>
+    <a href="/" class="{{ 'active' if active == 'home' else '' }}">Home</a>
+    <a href="/analysis" class="{{ 'active' if active == 'analysis' else '' }}">Analysis</a>
+    <a href="/playground" class="{{ 'active' if active == 'playground' else '' }}">Playground</a>
+    <a href="/about" class="{{ 'active' if active == 'about' else '' }}">About</a>
+  </nav>
+</header>
+
+<main class="page">
+  {% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+<footer class="simple-footer">
+  <span>Thesis demo &middot; code completion with deprecated-API-aware RAG</span>
+</footer>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

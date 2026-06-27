@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Analysis — DUR Completion{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <h1>Example cases</h1>
+  <p class="lede">
+    Saved completions illustrating deprecated-API detection and replacement.
+    {{ examples|length }} example(s) loaded — add your own real runs in
+    <code>backend/examples_data.py</code>.
+  </p>
+</section>
+
+<div class="tab-row page-tabs" id="modelTabs">
+  {% for key, cfg in models.items() %}
+  <button class="tab-btn{% if loop.first %} active{% endif %}" data-model="{{ key }}">
+    {{ cfg.label }}{% if not cfg.is_instruct %} &middot; base{% endif %}
+  </button>
+  {% endfor %}
+</div>
+
+<section class="examples-list">
+  {% for ex in examples %}
+  <article class="example-card" data-model="{{ ex.model_key }}">
+    <header>
+      <h3>{{ ex.title }}</h3>
+      <span class="tag">{{ ex.language }}</span>
+    </header>
+
+    <div class="example-grid">
+      <div>
+        <h4>Code before completion</h4>
+        <pre>{{ ex.deprecated_snippet }}</pre>
+      </div>
+      <div>
+        <h4>Retrieved context</h4>
+        <pre>{{ ex.context_used if ex.context_used else "— none used —" }}</pre>
+      </div>
+      <div>
+        <h4>Model completion</h4>
+        <pre>{{ ex.completion }}</pre>
+      </div>
+    </div>
+
+    {% if ex.notes %}<p class="notes">{{ ex.notes }}</p>{% endif %}
+  </article>
+  {% else %}
+  <p class="empty-state">No examples yet — add entries to <code>backend/examples_data.py</code>.</p>
+  {% endfor %}
+</section>
+
+<p class="empty-state" id="noExamplesForModel" style="display:none;">
+  No saved examples for this model yet — add one in <code>backend/examples_data.py</code>.
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/analysis.js"></script>
+{% endblock %}

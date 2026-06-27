@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+jinja2
+pydantic
+torch
+transformers>=4.39
+accelerate

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Playground — DUR Completion{% endblock %}
+{% block bodyclass %}playground-body{% endblock %}
+
+{% block content %}
+<div class="playground-toolbar">
+  <div class="tab-row" id="modelTabs"><span class="hint">Loading models&hellip;</span></div>
+  <span class="hint">Ctrl+Enter to complete &middot; Python only</span>
+  <div class="spacer"></div>
+  <button id="completeBtn">Complete</button>
+</div>
+
+<div class="playground-main">
+  <div id="editorPane"><div id="editor"></div></div>
+  <div id="sidePane">
+    <h2>Suggested completion</h2>
+    <div id="suggestionBox" class="empty">Place your cursor where you want code inserted, then click Complete.</div>
+    <div class="actionsRow">
+      <button id="insertBtn" disabled>Insert at cursor</button>
+      <button id="discardBtn" disabled>Discard</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="statusbar">
+  <span id="modelStatus"><span class="dot off"></span>connecting&hellip;</span>
+  <span id="cursorPos">Ln 1, Col 1</span>
+  <div class="spacer"></div>
+  <span id="modeLabel">no retrieval (yet)</span>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.49.0/min/vs/loader.min.js"></script>
+<script src="/static/playground.js"></script>
+{% endblock %}

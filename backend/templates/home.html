@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Home — DUR Completion{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <h1>Reducing deprecated API usage<br>in LLM code completion</h1>
+  <p class="lede">
+    A retrieval-augmented, finetuned code completion system that steers
+    generations toward modern, non-deprecated APIs — combining a
+    deprecated-API knowledge base with a finetuned DeepSeek-Coder model.
+  </p>
+  <div class="hero-actions">
+    <a href="/playground" class="btn btn-primary">Try the playground &rarr;</a>
+    <a href="/analysis" class="btn btn-secondary">See example cases</a>
+  </div>
+</section>
+
+<section class="grid-3">
+  <div class="card">
+    <h3>Retrieval</h3>
+    <p>Hybrid BM25 + dense retrieval over a deprecated-API knowledge base,
+       fused with reciprocal rank fusion and reranked with a cross-encoder,
+       surfaces relevant API-change context for the code being completed.</p>
+  </div>
+  <div class="card">
+    <h3>Finetuning</h3>
+    <p>DeepSeek-Coder-1.3B-instruct finetuned to prefer modern API usage
+       when completing code, compared against base-model and
+       retrieval-only baselines.</p>
+  </div>
+  <div class="card">
+    <h3>Evaluation</h3>
+    <p>Measured via Deprecated API Usage Rate (DUR) and Replacement Usage
+       Rate (RUR), alongside ROUGE-L, Hit@3, MRR and NDCG@3 for retrieval
+       quality.</p>
+  </div>
+</section>
+
+<p class="edit-note">— placeholder copy, edit freely in templates/home.html —</p>
+{% endblock %}
