@@ -133,8 +133,12 @@ def clean_completion(text: str, prefix: str = "") -> str:
     text = text.replace("Ċ", "\n").replace("Ġ", " ")
 
     # strip echoed prefix if model repeated it
-    if prefix and text.lstrip().startswith(prefix.lstrip()):
-        text = text.lstrip()[len(prefix.lstrip()):]
+    if prefix:
+        # normalize newlines before comparing — model sometimes adds extra blank lines
+        text_norm   = re.sub(r'\n+', '\n', text.strip())
+        prefix_norm = re.sub(r'\n+', '\n', prefix.strip())
+        if text_norm.startswith(prefix_norm):
+            text = text_norm[len(prefix_norm):]
 
     # cut at stop sequences
     cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i != -1]
