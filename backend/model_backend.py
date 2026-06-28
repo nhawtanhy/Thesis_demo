@@ -98,11 +98,11 @@ def build_prompt(probing: str, context: str = "", is_instruct: bool = True) -> s
 
 
 def retrieve_context(prefix: str) -> str:
-    """Stub for the RAG retriever. Wire your M3.2 hybrid retriever here
-    later. Returning "" (current behavior) means no retrieval is used —
-    build_prompt() falls back to its no-context branch for instruct models,
-    and is ignored entirely for base models."""
-    return ""
+    try:
+        import rag_backend
+        return rag_backend.retrieve(prefix)
+    except Exception:
+        return "" 
 
 
 # --- Output cleaning ---------------------------------------------------------

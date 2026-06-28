@@ -5,3 +5,6 @@ pydantic
 torch
 transformers>=4.39
 accelerate
+llama-index
+llama-index-retrievers-bm25
+sentence-transformers
