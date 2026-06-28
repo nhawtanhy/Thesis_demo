@@ -189,7 +189,7 @@ def generate(prefix, suffix="", model_key=DEFAULT_MODEL_KEY,
 
     completion_ids = output[0][input_ids.shape[1]:]
     text = tokenizer.decode(completion_ids, skip_special_tokens=True,
-                            clean_up_tokenization_spaces=True)
+                        clean_up_tokenization_spaces=False)
     completion = clean_completion(text)
     return completion, {
         "retrieved_context": context,
