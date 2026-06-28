@@ -129,35 +129,22 @@ def truncate_at_stop_sequence(text: str) -> str:
 
 
 def clean_completion(text: str) -> str:
+    # BPE artifact fix
     text = text.replace("Ċ", "\n").replace("Ġ", " ").strip()
 
+    # strip markdown fence if present
     m = _FENCE_RE.search(text)
     if m:
         text = m.group(1).strip()
     else:
         text = _PREAMBLE_RE.sub("", text, count=1).strip()
 
-    clean = re.sub(r"```[a-zA-Z]*\n?", "", text).replace("```", "").strip()
-    for line in clean.splitlines():
-        s = line.strip()
-        if not s or s.startswith("#"):
-            continue
-        if not re.search(r"[\w\.]+\s*\(", s):
-            continue
-        depth, cut, found = 0, len(s), False
-        for i, ch in enumerate(s):
-            if ch == "(": depth += 1
-            elif ch == ")":
-                depth -= 1
-                if depth == 0:
-                    cut = i + 1; found = True; break
-        if not found:
-            continue
-        result = re.sub(r"^[^a-zA-Z_]+", "", s[:cut].strip()).strip()
-        if result:
-            return result
+    # cut at stop sequences (new top-level def/class)
+    cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i != -1]
+    if cuts:
+        text = text[:min(cuts)]
 
-    return clean.split("\n")[0].strip()
+    return text.rstrip()
 
 
 # --- Generation --------------------------------------------------------------
@@ -200,8 +187,9 @@ def generate(prefix, suffix="", model_key=DEFAULT_MODEL_KEY,
 
     completion_ids = output[0][input_ids.shape[1]:]
     text = tokenizer.decode(completion_ids, skip_special_tokens=True,
-                        clean_up_tokenization_spaces=True)
-    return clean_completion(text), {
+                            clean_up_tokenization_spaces=True)
+    completion = clean_completion(text)
+    return completion, {
         "retrieved_context": context,
         "prompt_sent": prompt_text,
     }

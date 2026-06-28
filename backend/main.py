@@ -98,7 +98,7 @@ def complete(req: CompletionRequest):
         prefix=req.prefix,
         suffix=req.suffix,
         model_key=req.model_key,
-        max_new_tokens=min(req.max_tokens, 40),
+        max_new_tokens=min(req.max_tokens, 128),
         use_rag=req.use_rag,
     )
     return CompletionResponse(
@@ -106,7 +106,6 @@ def complete(req: CompletionRequest):
         retrieved_context=debug.get("retrieved_context", ""),
         prompt_sent=debug.get("prompt_sent", ""),
     )
-
 
 @app.post("/warmup/{model_key}")
 def warmup(model_key: str):
