@@ -65,6 +65,12 @@ async function requestCompletion() {
     const data = await res.json();
     lastSuggestion = data.completion;
     setSuggestion(lastSuggestion);
+
+    // update debug panel
+    document.getElementById("debugContext").textContent =
+        data.retrieved_context || "— none (RAG off or no hits) —";
+    document.getElementById("debugPrompt").textContent =
+        data.prompt_sent || "—";
     checkHealth(); // refresh "ready" status — this model is now warm
   } catch (err) {
     setError(`Couldn't reach the backend (${err.message}). Is uvicorn running on this machine?`);

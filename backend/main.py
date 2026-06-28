@@ -47,6 +47,8 @@ class CompletionRequest(BaseModel):
 
 class CompletionResponse(BaseModel):
     completion: str
+    retrieved_context: str = ""   # ← add
+    prompt_sent: str = ""         # ← add
 
 
 # --- Pages ----------------------------------------------------------------
@@ -92,14 +94,18 @@ def list_models():
 
 @app.post("/complete", response_model=CompletionResponse)
 def complete(req: CompletionRequest):
-    completion = model_backend.generate(
+    completion, debug = model_backend.generate(
         prefix=req.prefix,
         suffix=req.suffix,
         model_key=req.model_key,
         max_new_tokens=min(req.max_tokens, 40),
-        use_rag=req.use_rag, 
+        use_rag=req.use_rag,
     )
-    return CompletionResponse(completion=completion)
+    return CompletionResponse(
+        completion=completion,
+        retrieved_context=debug.get("retrieved_context", ""),
+        prompt_sent=debug.get("prompt_sent", ""),
+    )
 
 
 @app.post("/warmup/{model_key}")
