@@ -67,9 +67,11 @@ async function requestCompletion() {
     setSuggestion(lastSuggestion);
 
     // update debug panel
-    document.getElementById("debugContext").textContent =
+    const debugContext = document.getElementById("debugContext");
+    const debugPrompt  = document.getElementById("debugPrompt");
+    if (debugContext) debugContext.textContent =
         data.retrieved_context || "— none (RAG off or no hits) —";
-    document.getElementById("debugPrompt").textContent =
+    if (debugPrompt) debugPrompt.textContent =
         data.prompt_sent || "—";
     checkHealth(); // refresh "ready" status — this model is now warm
   } catch (err) {
