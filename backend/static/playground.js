@@ -2,11 +2,11 @@ const API_BASE = ""; // same-origin
 
 require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.49.0/min/vs" } });
 
-const STARTER_CODE = `import requests
+const STARTER_CODE = `import numpy as np
 
-def fetch_data(url):
-    # Cursor goes here — try completing this function.
-    resp = `;
+# Multiply all elements
+arr = np.array([2, 3, 4, 5])
+result = np.`;
 
 let editor;
 let healthData = null;
