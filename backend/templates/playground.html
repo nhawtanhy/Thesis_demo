@@ -13,8 +13,12 @@
 <div class="playground-main">
   <div id="editorPane"><div id="editor"></div></div>
   <div id="sidePane">
+    <div class="tab-row method-tabs" id="methodTabs">   <!-- ← move here -->
+      <button class="tab-btn active" data-rag="false">M0 · No RAG</button>
+      <button class="tab-btn" data-rag="true">M1 · BM25 + Rerank</button>
+    </div>
     <h2>Suggested completion</h2>
-    <div id="suggestionBox" class="empty">Place your cursor where you want code inserted, then click Complete.</div>
+    <div id="suggestionBox" class="empty">...</div>
     <div class="actionsRow">
       <button id="insertBtn" disabled>Insert at cursor</button>
       <button id="discardBtn" disabled>Discard</button>

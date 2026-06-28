@@ -162,18 +162,14 @@ def clean_completion(text: str) -> str:
 
 # --- Generation --------------------------------------------------------------
 @torch.inference_mode()
-def generate(
-    prefix: str,
-    suffix: str = "",
-    model_key: str = DEFAULT_MODEL_KEY,
-    max_new_tokens: int = 128,
-) -> str:
+def generate(prefix, suffix="", model_key=DEFAULT_MODEL_KEY,
+             max_new_tokens=128, use_rag=False):
     # NOTE: suffix is accepted for API/frontend stability but intentionally
     # unused — the thesis prompt format is prefix(+context)-only.
     cfg = MODEL_REGISTRY[model_key]
     tokenizer, model = _get_model(model_key)
 
-    context = retrieve_context(prefix)
+    context = retrieve_context(prefix) if use_rag else ""
     prompt_text = build_prompt(prefix, context, is_instruct=cfg["is_instruct"])
 
     if cfg["is_instruct"]:

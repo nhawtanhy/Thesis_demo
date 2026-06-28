@@ -59,7 +59,7 @@ async function requestCompletion() {
     const res = await fetch(`${API_BASE}/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prefix, suffix, model_key: modelKey, max_tokens: 128 }),
+      body: JSON.stringify({ prefix, suffix, model_key: selectedModelKey, max_tokens: 128, use_rag: useRag,}),
     });
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
     const data = await res.json();
@@ -146,6 +146,17 @@ async function loadModelOptions() {
     container.innerHTML = `<span class="hint">Couldn't load model list</span>`;
   }
 }
+
+let useRag = false;
+
+document.querySelectorAll("#methodTabs .tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#methodTabs .tab-btn")
+            .forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    useRag = btn.dataset.rag === "true";
+  });
+});
 
 function selectModel(key) {
   selectedModelKey = key;

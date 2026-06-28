@@ -145,6 +145,8 @@ body.playground-body main.page{
 .hint{ color:var(--text-dim); font-size:11px; }
 .spacer{ flex:1; }
 
+.method-tabs { padding: 6px 0 10px; margin-bottom: 8px; border-bottom: 1px solid var(--border); }
+
 .playground-main{ flex:1; display:flex; min-height:0; }
 #editorPane{ flex:1 1 62%; min-width:0; position:relative; }
 #editor{ position:absolute; inset:0; }
