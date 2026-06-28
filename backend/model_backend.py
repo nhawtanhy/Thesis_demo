@@ -134,10 +134,11 @@ def clean_completion(text: str, prefix: str = "") -> str:
 
     # strip echoed prefix if model repeated it
     if prefix:
-        # normalize newlines before comparing — model sometimes adds extra blank lines
         text_norm   = re.sub(r'\n+', '\n', text.strip())
-        prefix_norm = re.sub(r'\n+', '\n', prefix.strip())
-        if text_norm.startswith(prefix_norm):
+        # strip up to the last line break in prefix only — keep the partial token
+        prefix_for_cmp = re.sub(r'[^\n]*$', '', prefix.strip())  # drop last partial line
+        prefix_norm = re.sub(r'\n+', '\n', prefix_for_cmp)
+        if prefix_norm and text_norm.startswith(prefix_norm):
             text = text_norm[len(prefix_norm):]
 
     # cut at stop sequences
