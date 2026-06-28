@@ -118,7 +118,7 @@ _PREAMBLE_RE = re.compile(
 # harness. Base models especially will keep going for the full token budget
 # with no natural stopping point unless cut off here. Add more patterns if
 # you see a model wander off in a different direction.
-_STOP_SEQUENCES = ["\ndef ", "\nclass ", "\nif __name__", "\n\n\n", "\n\n"]
+_STOP_SEQUENCES = ["\ndef ", "\nclass ", "\nif __name__", "\n\n\n", "\n\n", "\nimport "]
 
 
 def truncate_at_stop_sequence(text: str) -> str:
@@ -129,20 +129,22 @@ def truncate_at_stop_sequence(text: str) -> str:
 
 
 def clean_completion(text: str) -> str:
-    # BPE artifact fix
-    text = text.replace("Ċ", "\n").replace("Ġ", " ").strip()
+    # BPE fix
+    text = text.replace("Ċ", "\n").replace("Ġ", " ")
 
-    # strip markdown fence if present
+    # cut BEFORE strip — catches leading \n\n that strip() would hide
+    cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i != -1]
+    if cuts:
+        text = text[:min(cuts)]
+
+    text = text.strip()
+
+    # strip markdown fence / preamble
     m = _FENCE_RE.search(text)
     if m:
         text = m.group(1).strip()
     else:
         text = _PREAMBLE_RE.sub("", text, count=1).strip()
-
-    # cut at stop sequences (new top-level def/class)
-    cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i != -1]
-    if cuts:
-        text = text[:min(cuts)]
 
     return text.rstrip()
 
