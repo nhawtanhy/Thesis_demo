@@ -23,6 +23,33 @@
       <button id="insertBtn" disabled>Insert at cursor</button>
       <button id="discardBtn" disabled>Discard</button>
     </div>
+    <details id="debugPanel" style="margin-top:14px;">
+    <summary style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                    text-transform:uppercase;letter-spacing:1px;
+                    color:var(--text-dim);cursor:pointer;">
+      Debug info
+    </summary>
+    <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                  text-transform:uppercase;letter-spacing:0.5px;
+                  color:var(--text-dim);margin:0 0 6px 0;">Retrieved context</h4>
+        <pre id="debugContext" style="background:#0e0f12;border:1px solid var(--border);
+            border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
+            font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+            margin:0;color:#8b919c;min-height:40px;">—</pre>
+      </div>
+      <div>
+        <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                  text-transform:uppercase;letter-spacing:0.5px;
+                  color:var(--text-dim);margin:0 0 6px 0;">Prompt sent to LLM</h4>
+        <pre id="debugPrompt" style="background:#0e0f12;border:1px solid var(--border);
+            border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
+            font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+            margin:0;color:#8b919c;min-height:40px;">—</pre>
+      </div>
+    </div>
+  </details>
   </div>
 </div>
 {% endblock %}
