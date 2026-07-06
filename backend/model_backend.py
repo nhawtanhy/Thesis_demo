@@ -7,12 +7,12 @@ model (gets raw code as-is, since base models just continue text and don't
 follow instructions). Models are loaded lazily on first use and cached in
 memory afterwards — see warmup() if you want to pre-load before a live demo.
 
-To add another model for cross-model comparison (e.g. StarCoder2-3B,
-CodeLlama-7B-Python): add an entry to MODEL_REGISTRY. Nothing else needs
-to change — main.py and the frontend read the registry dynamically.
+Adapter entries (adapter_path set) load a LoRA/PEFT adapter on top of the
+same base model_id and merge it in — used for the M3 (DPO) and M4 (GRPO)
+fine-tuned variants.
 
-To swap in your finetuned checkpoint: change "model_id" for the relevant
-entry to your local checkpoint path.
+To swap in a different checkpoint: change "model_id" or "adapter_path" for
+the relevant entry.
 """
 
 import re
@@ -29,11 +29,25 @@ MODEL_REGISTRY = {
         "label": "DeepSeek-Coder 1.3B (instruct)",
         "model_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
         "is_instruct": True,
+        "adapter_path": None,
     },
     "codegen-2b-mono": {
-        "label": "CodeGen 2B mono (base)",
+        "label": "CodeGen 2B (M0 base)",
         "model_id": "Salesforce/codegen-2B-mono",
         "is_instruct": False,
+        "adapter_path": None,
+    },
+    "codegen-2b-dpo": {
+        "label": "CodeGen 2B + DPO (M3)",
+        "model_id": "Salesforce/codegen-2B-mono",   # same base as codegen-2b-mono
+        "is_instruct": False,
+        "adapter_path": "/content/drive/MyDrive/thesis/Adapters/m5_dpo_codegen",
+    },
+    "codegen-2b-grpo": {
+        "label": "CodeGen 2B + GRPO (M4)",
+        "model_id": "Salesforce/codegen-2B-mono",   # same base as codegen-2b-mono
+        "is_instruct": False,
+        "adapter_path": "/content/drive/MyDrive/thesis/Adapters/m6_grpo_codegen",
     },
 }
 DEFAULT_MODEL_KEY = "deepseek-coder-1.3b-instruct"
@@ -51,7 +65,6 @@ def _get_model(key: str):
     print(f"[model_backend] Loading {cfg['model_id']} on {DEVICE} ...")
     tokenizer = AutoTokenizer.from_pretrained(cfg["model_id"], trust_remote_code=True)
     if tokenizer.pad_token is None:
-        # GPT2-family tokenizers (CodeGen included) often have no pad token.
         tokenizer.pad_token = tokenizer.eos_token
 
     model = AutoModelForCausalLM.from_pretrained(
@@ -59,10 +72,17 @@ def _get_model(key: str):
         trust_remote_code=True,
         torch_dtype=DTYPE,
     ).to(DEVICE)
-    model.eval()
 
+    if cfg.get("adapter_path"):
+        from peft import PeftModel
+        print(f"[model_backend] Applying LoRA adapter from {cfg['adapter_path']} ...")
+        model = PeftModel.from_pretrained(model, cfg["adapter_path"])
+        model = model.merge_and_unload()   # merge LoRA weights into base for faster inference
+        print(f"[model_backend] Adapter merged.")
+
+    model.eval()
     _cache[key] = (tokenizer, model)
-    print(f"[model_backend] {cfg['model_id']} loaded.")
+    print(f"[model_backend] {cfg['model_id']} ready.")
     return _cache[key]
 
 
@@ -102,7 +122,7 @@ def retrieve_context(prefix: str) -> str:
         import rag_backend
         return rag_backend.retrieve(prefix)
     except Exception:
-        return "" 
+        return ""
 
 
 # --- Output cleaning ---------------------------------------------------------
@@ -134,7 +154,7 @@ def clean_completion(text: str, prefix: str = "") -> str:
 
     # strip echoed prefix if model repeated it
     if prefix:
-        text_norm   = re.sub(r'\n+', '\n', text.strip())
+        text_norm = re.sub(r'\n+', '\n', text.strip())
         # strip up to the last line break in prefix only — keep the partial token
         prefix_for_cmp = re.sub(r'[^\n]*$', '', prefix.strip())  # drop last partial line
         prefix_norm = re.sub(r'\n+', '\n', prefix_for_cmp)
