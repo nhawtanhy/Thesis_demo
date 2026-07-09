@@ -271,3 +271,29 @@ body.playground-body main.page{
   .result-model{ min-width:0; }
   .result-completion{ white-space:pre-wrap; }
 }
+
+/* ===================================================================
+   Additions for: untested-outcome badge, per-result RAG context display
+   (append to the end of the "Analysis page — case cards" block in style.css)
+   =================================================================== */
+
+.result-row.outcome-untested .outcome-dot{ background:var(--text-dim); }
+.result-row.outcome-untested .outcome-label{
+  background:rgba(139,145,156,0.12); color:var(--text-dim);
+}
+.result-row.outcome-untested .result-completion{ color:var(--text-dim); font-style:italic; }
+
+.result-context{
+  margin:-2px 0 4px 21px; padding:8px 12px;
+  background:#0e0f12; border:1px solid var(--border); border-left:2px solid var(--amber-dim);
+  border-radius:0 6px 6px 0;
+}
+.result-context-label{
+  display:block; font-size:10px; text-transform:uppercase; letter-spacing:0.5px;
+  color:var(--text-dim); margin-bottom:5px; font-family:'JetBrains Mono',monospace;
+}
+.result-context pre{
+  margin:0; font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.5;
+  white-space:pre-wrap; word-break:break-word; color:#8b919c; background:transparent;
+  border:none; padding:0;
+}

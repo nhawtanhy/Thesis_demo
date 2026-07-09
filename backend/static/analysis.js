@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const payload = {
         prefix: btn.dataset.prefix,
         modelKey: btn.dataset.model,
+        useRag: btn.dataset.useRag === "true",
       };
       // sessionStorage survives the navigation to /playground; playground.js
       // reads this once on load, applies it, then clears it so a manual

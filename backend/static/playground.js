@@ -38,8 +38,9 @@ require(["vs/editor/editor.main"], function () {
 
 // Picks up a case handed off from the Analysis page's "Try live" button
 // (stashed in sessionStorage before navigating here). Applies the code
-// snippet to the editor and preselects the matching model tab, then
-// clears the stash so a manual refresh doesn't keep reapplying it.
+// snippet to the editor, preselects the matching model tab, and sets the
+// RAG method tab to match — then clears the stash so a manual refresh
+// afterwards doesn't keep reapplying it.
 function applyHandoffCase() {
   const raw = sessionStorage.getItem("demoLoadCase");
   if (!raw) return;
@@ -60,6 +61,14 @@ function applyHandoffCase() {
     const lastCol = model.getLineMaxColumn(lastLine);
     editor.setPosition({ lineNumber: lastLine, column: lastCol });
     editor.focus();
+  }
+
+  if (typeof payload.useRag === "boolean") {
+    useRag = payload.useRag;
+    document.querySelectorAll("#methodTabs .tab-btn").forEach((b) => {
+      const isMatch = (b.dataset.rag === "true") === payload.useRag;
+      b.classList.toggle("active", isMatch);
+    });
   }
 
   // Model tabs load asynchronously (loadModelOptions() below) — if the

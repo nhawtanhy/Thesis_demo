@@ -5,11 +5,11 @@
 <section class="page-header">
   <h1>Example cases</h1>
   <p class="lede">
-    Real (or placeholder) completions comparing how each method handles the
-    same deprecated-API scenario. {{ examples|length }} case(s) loaded &mdash;
-    add your own in <code>backend/examples_data.py</code>. Click
+    Real completions comparing how each method handles the same deprecated-API
+    scenario, pulled directly from D_test. {{ examples|length }} case(s) loaded
+    &mdash; add more in <code>backend/examples_data.py</code>. Click
     <strong>Try live</strong> on any row to load that exact input into the
-    Playground with the matching model preselected.
+    Playground with the matching model and RAG setting preselected.
   </p>
 </section>
 
@@ -26,33 +26,34 @@
       <pre>{{ case.deprecated_snippet }}</pre>
     </div>
 
-    {% if case.context_used %}
-    <div class="case-context">
-      <h4>Retrieved context (RAG)</h4>
-      <pre>{{ case.context_used }}</pre>
-    </div>
-    {% endif %}
-
     <div class="case-results">
-      <h4>Model outcomes</h4>
+      <h4>Method outcomes</h4>
       {% for r in case.results %}
       <div class="result-row outcome-{{ r.outcome }}">
         <span class="outcome-dot"></span>
         <span class="result-model">
-          {{ models[r.model_key].label if r.model_key in models else r.model_key }}
+          {{ r.method_label if r.method_label else (models[r.model_key].label if r.model_key in models else r.model_key) }}
         </span>
         <code class="result-completion">{{ r.completion }}</code>
         <span class="outcome-label">
           {% if r.outcome == "deprecated" %}deprecated API used
           {% elif r.outcome == "replacement" %}replacement API used
+          {% elif r.outcome == "untested" %}not yet verified
           {% else %}other{% endif %}
         </span>
         <button
           class="try-live-btn"
           data-prefix="{{ case.deprecated_snippet }}"
           data-model="{{ r.model_key }}"
+          data-use-rag="{{ 'true' if r.use_rag else 'false' }}"
         >Try live &rarr;</button>
       </div>
+      {% if r.use_rag and r.context_used %}
+      <div class="result-context">
+        <span class="result-context-label">Retrieved context for this row:</span>
+        <pre>{{ r.context_used }}</pre>
+      </div>
+      {% endif %}
       {% endfor %}
     </div>
 
