@@ -31,6 +31,18 @@ MODEL_REGISTRY = {
         "is_instruct": True,
         "adapter_path": None,
     },
+    "deepseek-coder-1.3b-dpo": {
+        "label": "DeepSeek-Coder 1.3B + DPO (M3)",
+        "model_id": "deepseek-ai/deepseek-coder-1.3b-instruct",   # same base as deepseek-coder-1.3b-instruct
+        "is_instruct": True,
+        "adapter_path": "/content/drive/MyDrive/thesis/Adapters/m5_dpo_deepseek",
+    },
+    "deepseek-coder-1.3b-grpo": {
+        "label": "DeepSeek-Coder 1.3B + GRPO (M4)",
+        "model_id": "deepseek-ai/deepseek-coder-1.3b-instruct",   # same base as deepseek-coder-1.3b-instruct
+        "is_instruct": True,
+        "adapter_path": "/content/drive/MyDrive/thesis/Adapters/m6_grpo_deepseek",
+    },
     "codegen-2b-mono": {
         "label": "CodeGen 2B (M0 base)",
         "model_id": "Salesforce/codegen-2B-mono",
@@ -61,6 +73,11 @@ def _get_model(key: str):
     if key in _cache:
         return _cache[key]
 
+    import gc
+    gc.collect()
+    if DEVICE == "cuda":
+        torch.cuda.empty_cache()
+
     cfg = MODEL_REGISTRY[key]
     print(f"[model_backend] Loading {cfg['model_id']} on {DEVICE} ...")
     tokenizer = AutoTokenizer.from_pretrained(cfg["model_id"], trust_remote_code=True)
@@ -71,7 +88,12 @@ def _get_model(key: str):
         cfg["model_id"],
         trust_remote_code=True,
         torch_dtype=DTYPE,
-    ).to(DEVICE)
+        low_cpu_mem_usage=True,   # avoid materializing a full fp32 copy before casting
+        use_safetensors=True,     # force safetensors only — avoids loading both .bin and .safetensors
+        device_map={"": DEVICE} if DEVICE == "cuda" else None,
+    )
+    if DEVICE != "cuda":
+        model = model.to(DEVICE)
 
     if cfg.get("adapter_path"):
         from peft import PeftModel
