@@ -32,7 +32,56 @@ require(["vs/editor/editor.main"], function () {
   });
 
   editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, requestCompletion);
+
+  applyHandoffCase();
 });
+
+// Picks up a case handed off from the Analysis page's "Try live" button
+// (stashed in sessionStorage before navigating here). Applies the code
+// snippet to the editor and preselects the matching model tab, then
+// clears the stash so a manual refresh doesn't keep reapplying it.
+function applyHandoffCase() {
+  const raw = sessionStorage.getItem("demoLoadCase");
+  if (!raw) return;
+  sessionStorage.removeItem("demoLoadCase");
+
+  let payload;
+  try {
+    payload = JSON.parse(raw);
+  } catch (err) {
+    return;
+  }
+
+  if (payload.prefix && editor) {
+    editor.setValue(payload.prefix);
+    // place cursor at the very end, matching where the model should complete
+    const model = editor.getModel();
+    const lastLine = model.getLineCount();
+    const lastCol = model.getLineMaxColumn(lastLine);
+    editor.setPosition({ lineNumber: lastLine, column: lastCol });
+    editor.focus();
+  }
+
+  // Model tabs load asynchronously (loadModelOptions() below) — if the
+  // handoff's model isn't registered yet, retry briefly until it is.
+  if (payload.modelKey) {
+    pendingHandoffModel = payload.modelKey;
+    trySelectPendingHandoffModel();
+  }
+}
+
+let pendingHandoffModel = null;
+
+function trySelectPendingHandoffModel() {
+  if (!pendingHandoffModel) return;
+  const btn = document.querySelector(`#modelTabs .tab-btn[data-model="${pendingHandoffModel}"]`);
+  if (btn) {
+    selectModel(pendingHandoffModel);
+    pendingHandoffModel = null;
+  } else {
+    setTimeout(trySelectPendingHandoffModel, 150);
+  }
+}
 
 document.getElementById("completeBtn").addEventListener("click", requestCompletion);
 
@@ -50,7 +99,6 @@ async function requestCompletion() {
     startLineNumber: pos.lineNumber, startColumn: pos.column,
     endLineNumber: model.getLineCount(), endColumn: model.getLineMaxColumn(model.getLineCount()),
   });
-  const modelKey = selectedModelKey;
 
   setLoading(true);
   setSuggestion(null);
@@ -59,7 +107,7 @@ async function requestCompletion() {
     const res = await fetch(`${API_BASE}/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prefix, suffix, model_key: selectedModelKey, max_tokens: 128, use_rag: useRag,}),
+      body: JSON.stringify({ prefix, suffix, model_key: selectedModelKey, max_tokens: 128, use_rag: useRag }),
     });
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
     const data = await res.json();
@@ -198,4 +246,7 @@ function updateModelStatusDisplay() {
     : `<span class="dot off"></span>${label} · ${healthData.device} · not loaded yet — first request will be slower`;
 }
 
-loadModelOptions().then(checkHealth);
+loadModelOptions().then(() => {
+  checkHealth();
+  trySelectPendingHandoffModel();
+});
