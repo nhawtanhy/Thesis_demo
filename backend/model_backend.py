@@ -4,8 +4,18 @@ Model backend for the code-completion IDE demo.
 Supports multiple models via MODEL_REGISTRY below — each entry is either
 an instruction-tuned model (gets the instruction-wrapped prompt) or a base
 model (gets raw code as-is, since base models just continue text and don't
-follow instructions). Models are loaded lazily on first use and cached in
-memory afterwards — see warmup() if you want to pre-load before a live demo.
+follow instructions).
+
+MEMORY MODEL: only ONE model is kept resident on the GPU at a time.
+Switching models (clicking a different tab) evicts whatever is currently
+loaded and loads the new one — this costs roughly 10-20 seconds per swap,
+but avoids the OOM crashes that occurred when trying to keep multiple
+models (even small 1-3B ones) simultaneously resident on a T4's ~14.5GB.
+This is a deliberate reliability trade-off for live-demo conditions.
+
+RAG (rag_backend.py — BM25 index + reranker) is a SEPARATE, always-resident
+component, unaffected by generation-model eviction. Once initialized, RAG
+stays loaded regardless of which generation model tab is active.
 
 Adapter entries (adapter_path set) load a LoRA/PEFT adapter on top of the
 same base model_id and merge it in — used for the M3 (DPO) and M4 (GRPO)
@@ -74,6 +84,20 @@ def _get_model(key: str):
         return _cache[key]
 
     import gc
+
+    # Eviction: only keep ONE model resident in GPU memory at a time.
+    # T4's usable memory has proven unreliable for holding even two small
+    # (1-3B) models simultaneously — swapping on tab click costs ~10-20s
+    # but avoids OOM crashes during a live demo.
+    if _cache:
+        evicted_key = next(iter(_cache))
+        print(f"[model_backend] Evicting {evicted_key} to free memory ...")
+        _, old_model = _cache.pop(evicted_key)
+        del old_model
+        gc.collect()
+        if DEVICE == "cuda":
+            torch.cuda.empty_cache()
+
     gc.collect()
     if DEVICE == "cuda":
         torch.cuda.empty_cache()
@@ -88,12 +112,9 @@ def _get_model(key: str):
         cfg["model_id"],
         trust_remote_code=True,
         torch_dtype=DTYPE,
-        low_cpu_mem_usage=True,   # avoid materializing a full fp32 copy before casting
-        use_safetensors=True,     # force safetensors only — avoids loading both .bin and .safetensors
-        device_map={"": DEVICE} if DEVICE == "cuda" else None,
-    )
-    if DEVICE != "cuda":
-        model = model.to(DEVICE)
+        low_cpu_mem_usage=True,
+        use_safetensors=True,
+    ).to(DEVICE)
 
     if cfg.get("adapter_path"):
         from peft import PeftModel
@@ -109,12 +130,17 @@ def _get_model(key: str):
 
 
 def warmup(key: str = DEFAULT_MODEL_KEY) -> None:
-    """Force-load a model ahead of time. Call this for every model you
-    plan to demo, before your defense starts, so switching is instant."""
+    """Pre-load ONE model before the demo starts, so the first click on
+    that tab is instant. Only call this for the model you'll show FIRST —
+    calling it for a second model will evict the first one immediately
+    (same eviction behavior as clicking a different tab), so there's no
+    benefit to warming up more than one model in advance."""
     _get_model(key)
 
 
 def loaded_models() -> list[str]:
+    """Returns the currently resident model (0 or 1 entries — eviction
+    means at most one model is ever loaded at once)."""
     return list(_cache.keys())
 
 
