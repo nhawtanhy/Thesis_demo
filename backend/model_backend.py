@@ -176,12 +176,43 @@ def build_prompt(probing: str, context: str = "", is_instruct: bool = True) -> s
     )
 
 
-def retrieve_context(prefix: str) -> str:
+def retrieve_context(prefix: str, rag_method: str = "none", intention: str = "") -> tuple[str, str]:
+    """
+    Returns (context_string, intention_used).
+
+    rag_method: "none" | "m1" | "m2"
+      "none" -> no retrieval, both return values are ""
+      "m1"   -> BM25 + bi-encoder rerank (rag_backend.retrieve)
+      "m2"   -> intent-extended RRF fusion (rag_backend.retrieve_m2).
+                If `intention` is empty (no precomputed intent known for
+                this input — i.e. live/free-typed Playground input), falls
+                back to generating one via intent_backend (CPU, ~9-11s).
+    """
+    if rag_method == "none":
+        return "", ""
+
     try:
         import rag_backend
-        return rag_backend.retrieve(prefix)
-    except Exception:
-        return ""
+
+        if rag_method == "m1":
+            return rag_backend.retrieve(prefix), ""
+
+        if rag_method == "m2":
+            used_intention = intention
+            if not used_intention.strip():
+                try:
+                    import intent_backend
+                    used_intention = intent_backend.generate_intent(prefix)
+                    print(f"[model_backend] Generated intent (CPU fallback): {used_intention!r}")
+                except Exception as e:
+                    print(f"[model_backend] Intent generation failed: {e}")
+                    used_intention = ""
+            return rag_backend.retrieve_m2(prefix, used_intention), used_intention
+
+        return "", ""
+    except Exception as e:
+        print(f"[model_backend] retrieve_context failed: {e}")
+        return "", ""
 
 
 # --- Output cleaning ---------------------------------------------------------
@@ -239,13 +270,13 @@ def clean_completion(text: str, prefix: str = "") -> str:
 # --- Generation --------------------------------------------------------------
 @torch.inference_mode()
 def generate(prefix, suffix="", model_key=DEFAULT_MODEL_KEY,
-             max_new_tokens=128, use_rag=False):
+             max_new_tokens=128, rag_method="none", intention=""):
     # NOTE: suffix is accepted for API/frontend stability but intentionally
     # unused — the thesis prompt format is prefix(+context)-only.
     cfg = MODEL_REGISTRY[model_key]
     tokenizer, model = _get_model(model_key)
 
-    context = retrieve_context(prefix) if use_rag else ""
+    context, intention_used = retrieve_context(prefix, rag_method, intention)
     prompt_text = build_prompt(prefix, context, is_instruct=cfg["is_instruct"])
 
     if cfg["is_instruct"]:
@@ -281,4 +312,5 @@ def generate(prefix, suffix="", model_key=DEFAULT_MODEL_KEY,
     return completion, {
         "retrieved_context": context,
         "prompt_sent": prompt_text,
+        "intention_used": intention_used,
     }

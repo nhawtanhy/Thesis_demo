@@ -13,43 +13,66 @@
 <div class="playground-main">
   <div id="editorPane"><div id="editor"></div></div>
   <div id="sidePane">
-    <div class="tab-row method-tabs" id="methodTabs">   <!-- ← move here -->
-      <button class="tab-btn active" data-rag="false">M0 · No RAG</button>
-      <button class="tab-btn" data-rag="true">M1 · BM25 + Rerank</button>
+    <div class="tab-row method-tabs" id="methodTabs">
+      <button class="tab-btn active" data-method="none">M0 &middot; No RAG</button>
+      <button class="tab-btn" data-method="m1">M1 &middot; BM25 + Rerank</button>
+      <button class="tab-btn" data-method="m2">M2 &middot; Intent-Extended</button>
     </div>
+
+    <div id="intentionRow" style="display:none;margin-bottom:10px;">
+      <label for="intentionInput" style="font-family:'JetBrains Mono',monospace;font-size:11px;
+             text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);
+             display:block;margin-bottom:5px;">
+        Intent (optional &mdash; leave blank to auto-generate, ~10s on CPU)
+      </label>
+      <input type="text" id="intentionInput" placeholder="e.g. Compute the product of array elements"
+             style="width:100%;background:#0e0f12;border:1px solid var(--border);border-radius:5px;
+             color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;" />
+    </div>
+
     <h2>Suggested completion</h2>
-    <div id="suggestionBox" class="empty">...</div>
+    <div id="suggestionBox" class="empty">Place your cursor where you want code inserted, then click Complete.</div>
     <div class="actionsRow">
       <button id="insertBtn" disabled>Insert at cursor</button>
       <button id="discardBtn" disabled>Discard</button>
     </div>
+
     <details id="debugPanel" style="margin-top:14px;">
-    <summary style="font-family:'JetBrains Mono',monospace;font-size:11px;
-                    text-transform:uppercase;letter-spacing:1px;
-                    color:var(--text-dim);cursor:pointer;">
-      Debug info
-    </summary>
-    <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
-      <div>
-        <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
-                  text-transform:uppercase;letter-spacing:0.5px;
-                  color:var(--text-dim);margin:0 0 6px 0;">Retrieved context</h4>
-        <pre id="debugContext" style="background:#0e0f12;border:1px solid var(--border);
-            border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
-            font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
-            margin:0;color:#8b919c;min-height:40px;">—</pre>
+      <summary style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                      text-transform:uppercase;letter-spacing:1px;
+                      color:var(--text-dim);cursor:pointer;">
+        Debug info
+      </summary>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
+        <div>
+          <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                    text-transform:uppercase;letter-spacing:0.5px;
+                    color:var(--text-dim);margin:0 0 6px 0;">Intent used (M2 only)</h4>
+          <pre id="debugIntention" style="background:#0e0f12;border:1px solid var(--border);
+              border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
+              font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+              margin:0;color:#8b919c;min-height:20px;">&mdash;</pre>
+        </div>
+        <div>
+          <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                    text-transform:uppercase;letter-spacing:0.5px;
+                    color:var(--text-dim);margin:0 0 6px 0;">Retrieved context</h4>
+          <pre id="debugContext" style="background:#0e0f12;border:1px solid var(--border);
+              border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
+              font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+              margin:0;color:#8b919c;min-height:40px;">&mdash;</pre>
+        </div>
+        <div>
+          <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
+                    text-transform:uppercase;letter-spacing:0.5px;
+                    color:var(--text-dim);margin:0 0 6px 0;">Prompt sent to LLM</h4>
+          <pre id="debugPrompt" style="background:#0e0f12;border:1px solid var(--border);
+              border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
+              font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+              margin:0;color:#8b919c;min-height:40px;">&mdash;</pre>
+        </div>
       </div>
-      <div>
-        <h4 style="font-family:'JetBrains Mono',monospace;font-size:11px;
-                  text-transform:uppercase;letter-spacing:0.5px;
-                  color:var(--text-dim);margin:0 0 6px 0;">Prompt sent to LLM</h4>
-        <pre id="debugPrompt" style="background:#0e0f12;border:1px solid var(--border);
-            border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;
-            font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
-            margin:0;color:#8b919c;min-height:40px;">—</pre>
-      </div>
-    </div>
-  </details>
+    </details>
   </div>
 </div>
 {% endblock %}

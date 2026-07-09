@@ -5,19 +5,18 @@ Run:
     cd backend
     uvicorn main:app --host 0.0.0.0 --port 8000
 
-Then open http://localhost:8000 in a browser.
-
 Pages:
     /            home / intro
-    /analysis    saved example cases (from examples_data.py)
+    /analysis    saved example cases + live "add & test" feature
     /playground  the Monaco-editor IDE, calls /complete
     /about       about page
 
 API:
-    GET  /models           list of registered models (for the dropdown)
-    POST /complete          { prefix, suffix, model_key, max_tokens } -> { completion }
-    POST /warmup/{model_key} force-load a model ahead of time
-    GET  /health            device + which models are currently loaded
+    GET  /models              list of registered models
+    POST /complete             { prefix, suffix, model_key, max_tokens,
+                                  rag_method, intention } -> { completion, ... }
+    POST /warmup/{model_key}   force-load a model ahead of time
+    GET  /health               device + which model is currently loaded
 """
 
 from pathlib import Path
@@ -41,14 +40,16 @@ class CompletionRequest(BaseModel):
     prefix: str
     suffix: str = ""
     model_key: str = model_backend.DEFAULT_MODEL_KEY
-    max_tokens: int = 40
-    use_rag: bool = False      # ← add this
+    max_tokens: int = 128
+    rag_method: str = "none"   # "none" | "m1" | "m2"
+    intention: str = ""        # known intent, if any — used by M2; ignored otherwise
 
 
 class CompletionResponse(BaseModel):
     completion: str
-    retrieved_context: str = ""   # ← add
-    prompt_sent: str = ""         # ← add
+    retrieved_context: str = ""
+    prompt_sent: str = ""
+    intention_used: str = ""
 
 
 # --- Pages ----------------------------------------------------------------
@@ -99,18 +100,22 @@ def complete(req: CompletionRequest):
         suffix=req.suffix,
         model_key=req.model_key,
         max_new_tokens=min(req.max_tokens, 128),
-        use_rag=req.use_rag,
+        rag_method=req.rag_method,
+        intention=req.intention,
     )
     return CompletionResponse(
         completion=completion,
         retrieved_context=debug.get("retrieved_context", ""),
         prompt_sent=debug.get("prompt_sent", ""),
+        intention_used=debug.get("intention_used", ""),
     )
+
 
 @app.post("/warmup/{model_key}")
 def warmup(model_key: str):
-    """Force-load a model ahead of time — handy to hit once for each model
-    right before your defense starts, so switching is instant on stage."""
+    """Force-load a model ahead of time. Only one model stays resident at
+    a time (see model_backend.py eviction) — calling this for a new model
+    evicts whatever was previously loaded."""
     model_backend.warmup(model_key)
     return {"status": "ok", "model_key": model_key, "loaded_models": model_backend.loaded_models()}
 

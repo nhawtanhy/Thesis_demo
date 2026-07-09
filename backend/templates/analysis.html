@@ -7,10 +7,58 @@
   <p class="lede">
     Real completions comparing how each method handles the same deprecated-API
     scenario, pulled directly from D_test. {{ examples|length }} case(s) loaded
-    &mdash; add more in <code>backend/examples_data.py</code>. Click
-    <strong>Try live</strong> on any row to load that exact input into the
-    Playground with the matching model and RAG setting preselected.
+    &mdash; add more permanently in <code>backend/examples_data.py</code>, or
+    test a new one live right here (session-only, not saved to disk). Click
+    <strong>Try live</strong> on any saved row to load that exact input into
+    the Playground.
   </p>
+</section>
+
+<section class="live-test-panel">
+  <button id="toggleLiveForm" class="btn-secondary" type="button">+ Add &amp; test a new case live</button>
+
+  <form id="liveTestForm" style="display:none;">
+    <div class="form-row">
+      <label for="liveTitle">Title (optional)</label>
+      <input type="text" id="liveTitle" placeholder="e.g. numpy.product \u2192 numpy.prod">
+    </div>
+
+    <div class="form-row">
+      <label for="liveSnippet">Code (cursor position = end of text)</label>
+      <textarea id="liveSnippet" rows="6" placeholder="import numpy as np&#10;arr = np.array([2, 3, 4, 5])&#10;result = np."></textarea>
+    </div>
+
+    <div class="form-row form-row-inline">
+      <div>
+        <label>Models to test</label>
+        <div id="liveModelChecks" class="checkbox-list">
+          <span class="hint">Loading models&hellip;</span>
+        </div>
+      </div>
+      <div>
+        <label for="liveRagMethod">RAG method</label>
+        <select id="liveRagMethod">
+          <option value="none">M0 &middot; No RAG</option>
+          <option value="m1">M1 &middot; BM25 + Rerank</option>
+          <option value="m2">M2 &middot; Intent-Extended</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row" id="liveIntentionRow" style="display:none;">
+      <label for="liveIntention">Intent (optional for M2 &mdash; leave blank to auto-generate, ~10s)</label>
+      <input type="text" id="liveIntention" placeholder="e.g. Compute the product of array elements">
+    </div>
+
+    <div class="form-row">
+      <button type="submit" id="liveRunBtn" class="btn-primary" style="border:none;cursor:pointer;">Run now</button>
+      <span id="liveRunStatus" class="hint" style="margin-left:10px;"></span>
+    </div>
+  </form>
+</section>
+
+<section class="cases-list" id="liveCasesContainer">
+  <!-- live-tested cases get prepended here by analysis.js -->
 </section>
 
 <section class="cases-list">
@@ -45,7 +93,8 @@
           class="try-live-btn"
           data-prefix="{{ case.deprecated_snippet }}"
           data-model="{{ r.model_key }}"
-          data-use-rag="{{ 'true' if r.use_rag else 'false' }}"
+          data-rag-method="{{ r.rag_method if r.rag_method else 'none' }}"
+          data-intention="{{ r.intention if r.intention else '' }}"
         >Try live &rarr;</button>
       </div>
       {% if r.use_rag and r.context_used %}

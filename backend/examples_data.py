@@ -67,6 +67,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M0 \u00b7 Base (no RAG)",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -74,6 +75,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-dpo",
                 "method_label": "M3 \u00b7 DPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -81,6 +83,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-grpo",
                 "method_label": "M4 \u00b7 GRPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -109,6 +112,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M0 \u00b7 Base (no RAG)",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -116,6 +120,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M1 \u00b7 BM25 + Rerank RAG",
                 "use_rag": True,
+                "rag_method": "m1",
                 "context_used": (
                     "Replacement API: numpy.prod\n"
                     "Deprecated: ['numpy.product']"
@@ -151,6 +156,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M1 \u00b7 BM25 + Rerank RAG",
                 "use_rag": True,
+                "rag_method": "m1",
                 "context_used": (
                     "Replacement API: numpy.prod\n"
                     "Deprecated: ['numpy.product']"
@@ -162,6 +168,8 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M2 \u00b7 Intent-Extended RAG",
                 "use_rag": True,
+                "rag_method": "m2",
+                "intention": "Calculate and return the memory size needed to execute the algorithm.",
                 "context_used": (
                     "Intent: \"Calculate and return the memory size needed to "
                     "execute the algorithm.\"\n"
@@ -202,6 +210,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-dpo",
                 "method_label": "M3 \u00b7 DPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -209,6 +218,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-grpo",
                 "method_label": "M4 \u00b7 GRPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -246,6 +256,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M0 \u00b7 Base (no RAG)",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -253,6 +264,8 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M2 \u00b7 Intent-Extended RAG",
                 "use_rag": True,
+                "rag_method": "m2",
+                "intention": "Generate plots for adversarial robustness analysis.",
                 "context_used": (
                     "Intent: \"Generate plots for adversarial robustness analysis.\"\n"
                     "Replacement API: seaborn.lineplot\n"
@@ -286,6 +299,7 @@ EXAMPLES = [
                 "model_key": "codegen-2b-mono",
                 "method_label": "M0 \u00b7 Base (no RAG)",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -293,6 +307,7 @@ EXAMPLES = [
                 "model_key": "codegen-2b-dpo",
                 "method_label": "M3 \u00b7 DPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -300,6 +315,7 @@ EXAMPLES = [
                 "model_key": "codegen-2b-grpo",
                 "method_label": "M4 \u00b7 GRPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -327,6 +343,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-instruct",
                 "method_label": "M0 \u00b7 Base (no RAG)",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -334,6 +351,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-dpo",
                 "method_label": "M3 \u00b7 DPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },
@@ -341,6 +359,7 @@ EXAMPLES = [
                 "model_key": "deepseek-coder-1.3b-grpo",
                 "method_label": "M4 \u00b7 GRPO",
                 "use_rag": False,
+                "rag_method": "none",
                 "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
                 "outcome": "untested",
             },

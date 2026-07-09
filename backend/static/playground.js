@@ -38,9 +38,8 @@ require(["vs/editor/editor.main"], function () {
 
 // Picks up a case handed off from the Analysis page's "Try live" button
 // (stashed in sessionStorage before navigating here). Applies the code
-// snippet to the editor, preselects the matching model tab, and sets the
-// RAG method tab to match — then clears the stash so a manual refresh
-// afterwards doesn't keep reapplying it.
+// snippet, model, RAG method, and known intention (if any) — then clears
+// the stash so a manual refresh doesn't keep reapplying it.
 function applyHandoffCase() {
   const raw = sessionStorage.getItem("demoLoadCase");
   if (!raw) return;
@@ -55,7 +54,6 @@ function applyHandoffCase() {
 
   if (payload.prefix && editor) {
     editor.setValue(payload.prefix);
-    // place cursor at the very end, matching where the model should complete
     const model = editor.getModel();
     const lastLine = model.getLineCount();
     const lastCol = model.getLineMaxColumn(lastLine);
@@ -63,16 +61,15 @@ function applyHandoffCase() {
     editor.focus();
   }
 
-  if (typeof payload.useRag === "boolean") {
-    useRag = payload.useRag;
-    document.querySelectorAll("#methodTabs .tab-btn").forEach((b) => {
-      const isMatch = (b.dataset.rag === "true") === payload.useRag;
-      b.classList.toggle("active", isMatch);
-    });
+  if (payload.ragMethod) {
+    setRagMethod(payload.ragMethod);
   }
 
-  // Model tabs load asynchronously (loadModelOptions() below) — if the
-  // handoff's model isn't registered yet, retry briefly until it is.
+  if (payload.intention) {
+    const intentionInput = document.getElementById("intentionInput");
+    if (intentionInput) intentionInput.value = payload.intention;
+  }
+
   if (payload.modelKey) {
     pendingHandoffModel = payload.modelKey;
     trySelectPendingHandoffModel();
@@ -108,6 +105,8 @@ async function requestCompletion() {
     startLineNumber: pos.lineNumber, startColumn: pos.column,
     endLineNumber: model.getLineCount(), endColumn: model.getLineMaxColumn(model.getLineCount()),
   });
+  const intentionInput = document.getElementById("intentionInput");
+  const intention = intentionInput ? intentionInput.value.trim() : "";
 
   setLoading(true);
   setSuggestion(null);
@@ -116,21 +115,29 @@ async function requestCompletion() {
     const res = await fetch(`${API_BASE}/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prefix, suffix, model_key: selectedModelKey, max_tokens: 128, use_rag: useRag }),
+      body: JSON.stringify({
+        prefix, suffix,
+        model_key: selectedModelKey,
+        max_tokens: 128,
+        rag_method: ragMethod,
+        intention: intention,
+      }),
     });
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
     const data = await res.json();
     lastSuggestion = data.completion;
     setSuggestion(lastSuggestion);
 
-    // update debug panel
-    const debugContext = document.getElementById("debugContext");
-    const debugPrompt  = document.getElementById("debugPrompt");
+    const debugContext   = document.getElementById("debugContext");
+    const debugPrompt    = document.getElementById("debugPrompt");
+    const debugIntention = document.getElementById("debugIntention");
     if (debugContext) debugContext.textContent =
         data.retrieved_context || "— none (RAG off or no hits) —";
     if (debugPrompt) debugPrompt.textContent =
         data.prompt_sent || "—";
-    checkHealth(); // refresh "ready" status — this model is now warm
+    if (debugIntention) debugIntention.textContent =
+        data.intention_used || (ragMethod === "m2" ? "— none generated/provided —" : "— (only used for M2) —");
+    checkHealth();
   } catch (err) {
     setError(`Couldn't reach the backend (${err.message}). Is uvicorn running on this machine?`);
   } finally {
@@ -212,16 +219,20 @@ async function loadModelOptions() {
   }
 }
 
-let useRag = false;
+let ragMethod = "none"; // "none" | "m1" | "m2"
 
 document.querySelectorAll("#methodTabs .tab-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("#methodTabs .tab-btn")
-            .forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    useRag = btn.dataset.rag === "true";
-  });
+  btn.addEventListener("click", () => setRagMethod(btn.dataset.method));
 });
+
+function setRagMethod(method) {
+  ragMethod = method;
+  document.querySelectorAll("#methodTabs .tab-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.method === method);
+  });
+  const intentionRow = document.getElementById("intentionRow");
+  if (intentionRow) intentionRow.style.display = method === "m2" ? "block" : "none";
+}
 
 function selectModel(key) {
   selectedModelKey = key;
