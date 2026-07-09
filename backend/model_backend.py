@@ -99,7 +99,18 @@ def loaded_models() -> list[str]:
 # --- Prompt construction (matches thesis prompt format) --------------------
 def build_prompt(probing: str, context: str = "", is_instruct: bool = True) -> str:
     if not is_instruct:
-        # Base models: no instruction-following — raw continuation only.
+        # Base models: no instruction-following, but RAG context IS used —
+        # presented as Python comments directly above the code, matching
+        # the thesis's M1/M2 base-model prompt format (see
+        # M1_dtrain_dtest_codegen.py's build_prompt). This is the pattern
+        # base models see constantly during pretraining (a comment hinting
+        # at intent, immediately followed by code), so it acts as a
+        # natural continuation cue rather than an instruction to "understand."
+        if context:
+            commented_context = "\n".join(
+                f"# {line}" for line in context.splitlines() if line.strip()
+            )
+            return f"{commented_context}\n{probing}"
         return probing
 
     if context:

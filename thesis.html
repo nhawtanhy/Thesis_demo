@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conclusion and Future Work</title>
+    <!-- Inter Font & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --hust-blue: #0A3B75;
+            --hust-red: #C9232B;
+            --text-dark: #1E293B;
+            --text-muted: #475569;
+            --bg-card: #F8FAFC;
+            --border-color: #CBD5E1;
+            
+            /* High contrast pillar accents */
+            --accent-conclusion: #0F766E; /* Teal */
+            --accent-future: #B45309;     /* Amber/Brown */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #475569;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Slide Window Fixed 16:9 Aspect Ratio */
+        .slide-container {
+            width: 1024px;
+            height: 576px;
+            background-color: #FFFFFF;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .slide-header {
+            background-color: var(--hust-blue);
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chapter-title {
+            color: #FFFFFF;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .red-accent-line {
+            height: 5px;
+            background-color: var(--hust-red);
+            width: 100%;
+        }
+
+        .slide-body {
+            flex: 1;
+            padding: 30px 40px 10px 40px;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 24px;
+        }
+
+        /* Scientific Section Columns */
+        .section-pillar {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .pillar-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-pillar.conclusion .pillar-header {
+            color: var(--accent-conclusion);
+            border-bottom: 2px solid var(--accent-conclusion);
+        }
+
+        .section-pillar.future-work .pillar-header {
+            color: var(--accent-future);
+            border-bottom: 2px solid var(--accent-future);
+        }
+
+        /* Grid List Items mapping logical bullets */
+        .bullet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            list-style: none;
+        }
+
+        .bullet-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: var(--text-dark);
+        }
+
+        .bullet-item i {
+            margin-top: 3px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .conclusion .bullet-item i {
+            color: var(--accent-conclusion);
+        }
+
+        .future-work .bullet-item i {
+            color: var(--accent-future);
+        }
+
+        /* Bold inline triggers */
+        .bullet-item strong {
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        /* Strict Slide Footers matching HUST style */
+        .slide-footer {
+            padding: 0 40px 16px 40px;
+            margin-top: auto;
+        }
+
+        .footer-line {
+            height: 1.5px;
+            background-color: var(--hust-red);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hust-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+        }
+
+        .slide-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--hust-blue);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container" id="slideConclusionFuture">
+        <div class="slide-header"><span class="chapter-title">IV. Conclusion & Future Work</span></div>
+        <div class="red-accent-line"></div>
+        
+        <div class="slide-body">
+            
+            <!-- Left Pillar: Conclusion -->
+            <div class="section-pillar conclusion">
+                <div class="pillar-header">
+                    <i class="fa-solid fa-square-check"></i> Conclusion
+                </div>
+                <ul class="bullet-list">
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-circle-right"></i>
+                        <span><strong>RAG Constraints:</strong> Retrieval updates improve API selection prompts natively, but fail to completely suppress or unlearn the model's underlying deprecated-pattern parameter biases.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-circle-right"></i>
+                        <span><strong>Framework Evaluation:</strong> Proposed and rigorously benchmarked retrieval-based (M1, M2) vs. training-based (DPO, GRPO) mitigation paths across 4 distinct LLM architectures.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-circle-right"></i>
+                        <span><strong>GRPO Advantages:</strong> Upon convergence, GRPO yields optimal empirical limits, simultaneously upgrading functional generation correctness and syntax structural fluency.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-circle-right"></i>
+                        <span><strong>Core Driver:</strong> Demonstrated that a model's foundational pretraining paradigm—rather than absolute parameter capacity scales—governs optimal correction technique alignment.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Pillar: Future Work -->
+            <div class="section-pillar future-work">
+                <div class="pillar-header">
+                    <i class="fa-solid fa-compass"></i> Future Work
+                </div>
+                <ul class="bullet-list">
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span><strong>FIM Extensions:</strong> Engineer custom Fill-In-the-Middle (FIM) compatible objective contexts to natively accommodate specialized code architectures like StarCoder2.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span><strong>Hybrid Pipelines:</strong> Co-design unified pipelines that dynamically layer real-time retrieval matching blocks right on top of preference-optimized network parameters.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span><strong>Stricter Metrics:</strong> Implement rigorous replacement usage evaluation targets (RUR) by requiring precision tracking of fully qualified API object naming formats.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        <span><strong>Scope Expansion:</strong> Broaden overall benchmark evaluation coverage to cross-evaluate a wider array of programming dialects and open-source software libraries.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="slide-footer">
+            <div class="footer-line"></div>
+            <div class="footer-content">
+                <div class="hust-identity"><span class="hust-text">Đại học Bách Khoa Hà Nội</span></div>
+                <span class="slide-num">22</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
