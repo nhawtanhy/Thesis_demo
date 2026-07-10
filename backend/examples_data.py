@@ -45,7 +45,6 @@ output, then replace the placeholder fields before your defense.
 EXAMPLES = [
 
     # ── Case 3: torch.qr -> torch.linalg.qr (all 5 methods, real retrieved context + prompts) ──
-    # ── Case 3: torch.qr -> torch.linalg.qr (all 5 methods, real retrieved context + prompts) ──
     {
         "title": "torch.qr \u2192 torch.linalg.qr",
         "language": "python",
@@ -169,7 +168,125 @@ EXAMPLES = [
             "the replacement API."
         ),
     },
-    
+
+    # ── Case 4: numpy.product -> numpy.prod (all 5 methods, clean success across the board) ──
+    {
+        "title": "numpy.product \u2192 numpy.prod",
+        "language": "python",
+        "deprecated_snippet": (
+            "import numpy as np\n\n"
+            "# Compute the product of all elements in the array\n"
+            "arr = np.array([2, 3, 4, 5])\n"
+            "result = np."
+        ),
+        "results": [
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M0 \u00b7 Base (no RAG)",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Compute the product of all elements in the array\n"
+                    "arr = np.array([1, 2, 3, 4, 5])\n"
+                    "result = np.prod(arr)\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M1 \u00b7 BM25 + Rerank RAG",
+                "use_rag": True,
+                "rag_method": "m1",
+                "context_used": (
+                    "Replacement API: numpy.prod\n"
+                    "Deprecated: ['numpy.product']\n"
+                    "Example: num_items_per_element=np.prod(shape)ifshapeelse1\n\n"
+                    "---\n\n"
+                    "Replacement API: numpy.all\n"
+                    "Deprecated: ['numpy.alltrue']\n"
+                    "Example: self.assertTrue(np.alltrue(arr==arr_recovered))"
+                ),
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Compute the product of all elements in the array\n"
+                    "arr = np.array([1, 2, 3, 4, 5])\n"
+                    "result = np.prod(arr)\n"
+                    "print(result)\n\n"
+                    "# Check if all elements in an array are equal to a certain value\n"
+                    "arr = [1, 1, 3]\n"
+                    "arr_rec = np.recarray([2], dtype=[('a', int)], chunksize=(1,))\n"
+                    "arr_chunk = np.frompyfunc(lambda x, y"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M2 \u00b7 Intent-Extended RAG",
+                "use_rag": True,
+                "rag_method": "m2",
+                "intention": "Compute the product of all elements in the array",
+                "context_used": (
+                    "Replacement API: numpy.all\n"
+                    "Deprecated: ['numpy.alltrue']\n"
+                    "Example: self.assertTrue(np.alltrue(arr==arr_recovered))\n\n"
+                    "---\n\n"
+                    "Replacement API: numpy.prod\n"
+                    "Deprecated: ['numpy.product']\n"
+                    "Example: npy=np.arange(np.prod(shape)).reshape(shape)"
+                ),
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Compute the product of all elements in the array\n"
+                    "arr = np.array([1, 2, 3, 4, 5])\n"
+                    "result = np.prod(arr)\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-dpo",
+                "method_label": "M3 \u00b7 DPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Compute the product of all elements in the array\n"
+                    "arr = np.array([1,2,3])\n"
+                    "result = np.prod(arr)\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-grpo",
+                "method_label": "M4 \u00b7 GRPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Compute the product of all elements in the array\n"
+                    "arr = np.array([1, 2, 3, 4, 5])\n"
+                    "result = np.prod(arr)\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+        ],
+        "notes": (
+            "Real test case, live-verified across all 5 methods with real "
+            "retrieved context captured for M1/M2. Every method correctly "
+            "uses numpy.prod \u2014 the cleanest, most reliable case tested this "
+            "session. Good candidate for opening the demo, before moving to "
+            "the numpy.alltrue and torch.qr cases which show more nuanced "
+            "(and more interesting) divergence between methods. Note M1's "
+            "completion wanders into an unrelated second block after the "
+            "correct answer (harmless here since RUR/DUR only look at the "
+            "first completed line, but visually verbose if shown at length "
+            "live)."
+        ),
+    },
     # ── Case 2: numpy.alltrue -> numpy.all (all 5 methods, real retrieved context + prompts) ──
     {
         "title": "numpy.alltrue \u2192 numpy.all",
