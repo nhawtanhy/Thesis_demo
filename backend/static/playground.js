@@ -239,6 +239,24 @@ function selectModel(key) {
   document.querySelectorAll("#modelTabs .tab-btn").forEach((b) => {
     b.classList.toggle("active", b.dataset.model === key);
   });
+
+  // DPO/GRPO models were never trained or evaluated with RAG context
+  // injected — feeding them context anyway produces out-of-distribution,
+  // garbled output. Force RAG off and disable the method tabs whenever
+  // a weight-updated model is selected, to prevent accidentally leaving
+  // RAG on from a previous tab and silently contaminating the prompt.
+  const isWeightUpdated = key.includes("dpo") || key.includes("grpo");
+  document.querySelectorAll("#methodTabs .tab-btn").forEach((b) => {
+    b.disabled = isWeightUpdated;
+    b.style.opacity = isWeightUpdated ? "0.4" : "1";
+    b.style.cursor = isWeightUpdated ? "not-allowed" : "pointer";
+  });
+  const intentionRow = document.getElementById("intentionRow");
+  if (isWeightUpdated) {
+    setRagMethod("none");
+    if (intentionRow) intentionRow.style.display = "none";
+  }
+
   updateModelStatusDisplay();
 }
 

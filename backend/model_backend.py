@@ -238,6 +238,9 @@ def truncate_at_stop_sequence(text: str) -> str:
     return text.rstrip()
 
 
+_UNCLOSED_FENCE_RE = re.compile(r"^```[a-zA-Z]*\n?")
+
+
 def clean_completion(text: str, prefix: str = "") -> str:
     # BPE fix
     text = text.replace("Ċ", "\n").replace("Ġ", " ")
@@ -251,8 +254,18 @@ def clean_completion(text: str, prefix: str = "") -> str:
         if prefix_norm and text_norm.startswith(prefix_norm):
             text = text_norm[len(prefix_norm):]
 
-    # cut at stop sequences
-    cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i != -1]
+    # cut at stop sequences — but IGNORE matches too close to the start.
+    # When RAG context is present, the model sometimes restarts/echoes the
+    # prompt's CODE section from scratch (e.g. "\n\nimport torch\n\n#...")
+    # instead of continuing directly. A stop sequence like "\nimport " can
+    # then fire within the first few characters, cutting the ENTIRE
+    # completion down to nothing. A genuine "model wandered into a new
+    # unrelated definition after giving a real answer" case never happens
+    # this early — there's no room for an answer before position ~5 — so
+    # matches this close to the start are always the restart artifact, not
+    # useful signal, and are skipped.
+    MIN_STOP_POSITION = 5
+    cuts = [i for i in (text.find(s) for s in _STOP_SEQUENCES) if i > MIN_STOP_POSITION]
     if cuts:
         text = text[:min(cuts)]
 
@@ -260,8 +273,14 @@ def clean_completion(text: str, prefix: str = "") -> str:
 
     m = _FENCE_RE.search(text)
     if m:
+        # properly closed fence — extract just the code between the markers
         text = m.group(1).strip()
     else:
+        # no closed fence found — still strip a lone UNCLOSED opening fence
+        # (e.g. "```python" with no matching closing "```", which happens
+        # when generation gets cut off by a stop sequence or token limit
+        # before the model closes its own fence) and any preamble text
+        text = _UNCLOSED_FENCE_RE.sub("", text, count=1)
         text = _PREAMBLE_RE.sub("", text, count=1).strip()
 
     return text.rstrip()
