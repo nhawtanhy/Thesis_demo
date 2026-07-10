@@ -96,6 +96,252 @@ EXAMPLES = [
         ),
     },
 
+    # ── Case 3: torch.qr -> torch.linalg.qr (all 5 methods, real retrieved context + prompts) ──
+    {
+        "title": "torch.qr \u2192 torch.linalg.qr",
+        "language": "python",
+        "deprecated_snippet": (
+            "import torch\n\n"
+            "# Compute the QR decomposition of the matrix\n"
+            "matrix = torch.randn(5, 3)\n"
+            "q, r = torch."
+        ),
+        "results": [
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M0 \u00b7 Base (no RAG)",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import torch\n\n"
+                    "# Compute the QR decomposition of the matrix\n"
+                    "q, r = torch.qr(matrix)\n"
+                    "print(q)\n"
+                    "print(r)"
+                ),
+                "outcome": "deprecated",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M1 \u00b7 BM25 + Rerank RAG",
+                "use_rag": True,
+                "rag_method": "m1",
+                "context_used": (
+                    "Replacement API: torch.linalg.qr\n"
+                    "Deprecated: ['torch.qr']\n"
+                    "Example: q,r=torch.qr(tensor)"
+                ),
+                "completion": (
+                    "import torch\n\n"
+                    "# Generate a random 5x3 matrix\n"
+                    "matrix = torch.rand(5, 3)\n\n"
+                    "# Compute the QR decomposition\n"
+                    "q, r = torchch.lina.qr.qr_decomposition(matrix)\n"
+                    "print(\"Q:\")\n"
+                    "print(q)\n"
+                    "print(\"R:\")\n"
+                    "# Print the resultant R matrix\n"
+                    "print(r)"
+                ),
+                "outcome": "other",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M2 \u00b7 Intent-Extended RAG",
+                "use_rag": True,
+                "rag_method": "m2",
+                "intention": "Compute the QR decomposition of the matrix",
+                "context_used": (
+                    "Replacement API: torch.linalg.qr\n"
+                    "Deprecated: ['torch.qr']\n"
+                    "Example: Q,R=torch.linalg.qr(x,mode=mode)"
+                ),
+                "completion": (
+                    "import torch\n\n"
+                    "# Generate a random matrix\n"
+                    "matrix = torch.rand(5, 3)\n\n"
+                    "# Compute the QR decomposition\n"
+                    "q, r = torchch.lina.qr_decomposition(matrix, mode='complete')\n"
+                    "print(\"Q:\")\n"
+                    "print(q)\n"
+                    "print(\"R:\")\n"
+                    "# Printing the R matrix\n"
+                    "print(r)"
+                ),
+                "outcome": "other",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-dpo",
+                "method_label": "M3 \u00b7 DPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import torch#ComputeandQRdecompostionofthematrix=torchaudio.transforms_spectral"
+                    "#ComputeQRdeformationofthematrix#Compute_torch_tensor_of_the_QR_decomposition_of_"
+                    "matrix_matrix=torchengine.contextmanager_torch.matmul(torch.linalg.QR(torch_"
+                    "torchaudio.transforms.spectral.compute_spectrum_tensor(torchaudio_torchengine."
+                    "engine.contextmanager(torch).matmul((tor"
+                ),
+                "outcome": "other",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-grpo",
+                "method_label": "M4 \u00b7 GRPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import torch\n\n"
+                    "# Compute the QR decomposition of the matrix\n"
+                    "q, r = torch.linalg.qr(matrix)\n\n"
+                    "# Output the Q and R matrices\n"
+                    "print(\"Q matrix:\")\n"
+                    "print(q)\n"
+                    "print(\"R matrix:\")\n"
+                    "print(r)"
+                ),
+                "outcome": "replacement",
+            },
+        ],
+        "notes": (
+            "Real test case, live-verified across all 5 methods with real "
+            "retrieved context and prompts captured for M1/M2. M0 uses the "
+            "deprecated torch.qr directly. Both M1 and M2 correctly RETRIEVE "
+            "the right replacement (torch.linalg.qr) with clean, correct "
+            "example lines in their context \u2014 yet the model still produces "
+            "garbled, syntactically invalid calls (\"torchch.lina...\") rather "
+            "than using the retrieved API correctly. M3 (DPO) produces "
+            "severely garbled, run-on hallucinated text unrelated to valid "
+            "torch syntax. M4 (GRPO) is the only method producing a clean, "
+            "syntactically correct call to the replacement API. Strong "
+            "candidate for defense: shows RAG can retrieve the right answer "
+            "and still fail to apply it, while GRPO succeeds without any "
+            "retrieval at all \u2014 directly illustrating the thesis's core "
+            "finding that retrieval alone cannot guarantee correct usage."
+        ),
+    },
+
+    # ── Case 2: numpy.alltrue -> numpy.all (all 5 methods, real retrieved context + prompts) ──
+    {
+        "title": "numpy.alltrue \u2192 numpy.all",
+        "language": "python",
+        "deprecated_snippet": (
+            "import numpy as np\n\n"
+            "# Check that every element in the array is positive\n"
+            "values = np.array([3, 7, 1, 9])\n"
+            "result = np."
+        ),
+        "results": [
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M0 \u00b7 Base (no RAG)",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Check that every element in the array is a positive value\n"
+                    "result = np.all(np.array(your_array) > 0)\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M1 \u00b7 BM25 + Rerank RAG",
+                "use_rag": True,
+                "rag_method": "m1",
+                "context_used": (
+                    "Replacement API: numpy.all\n"
+                    "Deprecated: ['numpy.alltrue']\n"
+                    "Example: assertnp.all(z==np.array([0.0,4.0,0.0],dtype=\">f8\"))\n\n"
+                    "---\n\n"
+                    "Replacement API: numpy.prod\n"
+                    "Deprecated: ['numpy.product']\n"
+                    "Example: returnnp.prod(x**p)"
+                ),
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Check if every element in the array is positive\n"
+                    "result = np.all(np.array(your_array) > 0)\n"
+                    "# If all elements are positive, return the product of the elements\n"
+                    "if result:\n"
+                    "    return np.prod(your_list)\n"
+                    "else:\n"
+                    "    # If not all elements are negative, return the sum of the elements in the array\n"
+                    "    return sum(your_other_array)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-instruct",
+                "method_label": "M2 \u00b7 Intent-Extended RAG",
+                "use_rag": True,
+                "rag_method": "m2",
+                "intention": "Check that every element in the array is positive",
+                "context_used": (
+                    "Replacement API: numpy.prod\n"
+                    "Deprecated: ['numpy.product']\n"
+                    "Example: returnnp.prod(x**p)\n\n"
+                    "---\n\n"
+                    "Replacement API: numpy.all\n"
+                    "Deprecated: ['numpy.alltrue']\n"
+                    "Example: assert_equal(np.all(a,where=wh_full),True)"
+                ),
+                "completion": (
+                    "import numpy as np\n\n"
+                    "# Check that every element in the array is positive\n"
+                    "result = np.all(np.array(your_array) > 0)\n"
+                    "# If all elements are positive, return the product of all elements\n"
+                    "if result:\n"
+                    "    return np.prod(your_input)"
+                ),
+                "outcome": "replacement",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-dpo",
+                "method_label": "M3 \u00b7 DPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "import numpy as np#Check that every element in the array is a positive "
+                    "value=np. array([3, 7, 1, 9])result = np.mean(np.where(np.array(result) > 0))"
+                ),
+                "outcome": "other",
+            },
+            {
+                "model_key": "deepseek-coder-1.3b-grpo",
+                "method_label": "M4 \u00b7 GRPO",
+                "use_rag": False,
+                "rag_method": "none",
+                "completion": (
+                    "iimport numpy as np\n\n"
+                    "# Check that every element in the array is a positive value\n"
+                    "result = np.all(np.array(list(map(lambda x: x > 0, your_array))))\n"
+                    "# Print the result\n"
+                    "print(result)"
+                ),
+                "outcome": "replacement",
+            },
+        ],
+        "notes": (
+            "Real test case, live-verified across all 5 methods with real "
+            "retrieved context captured for M1/M2. M0, M1, M2, and M4 all "
+            "correctly use numpy.all (the replacement) \u2014 though every "
+            "completion hallucinates a placeholder variable name "
+            "(\"your_array\") instead of using the actual \"values\" variable "
+            "defined in the input, a real quality issue distinct from API "
+            "correctness. M3 (DPO) is the outlier: instead of using either "
+            "numpy.all or numpy.alltrue, it uses numpy.mean \u2014 an entirely "
+            "unrelated operation \u2014 despite no RAG context being involved, "
+            "classified here as 'other' (mismatch) rather than deprecated or "
+            "replacement. M2's intention text is inferred to directly match "
+            "the code's own comment, since it wasn't separately confirmed in "
+            "testing (unlike the torch.qr case). M4's completion begins with "
+            "a duplicated leading character (\"iimport\") \u2014 verify whether "
+            "this is a genuine model artifact or a copy-paste duplication "
+            "before presenting live."
+        ),
+    },
+
     # ── Case 2: M1 (RAG) vs M0, same model ──────────────────────────────────
     {
         "title": "numpy.product \u2192 numpy.prod (make_permutation_code)",
@@ -228,58 +474,6 @@ EXAMPLES = [
             "\"test function\" special case: the deprecated API's use should be "
             "judged on the operation being tested, not the test wrapper itself). "
             "Good candidate for showing GRPO vs DPO divergence if their outputs differ."
-        ),
-    },
-
-    # ── Case 5: long/complex context, tests retrieval + generation together ─
-    {
-        "title": "seaborn.tsplot \u2192 seaborn.lineplot (gen_adv_plots)",
-        "language": "python",
-        "deprecated_snippet": (
-            "def gen_adv_plots(df_image, ood=False):\n"
-            "    print(f\"Generating calibration plot with ood={ood}\")\n"
-            "    df = df_image[df_image[\"OOD\"]==ood]\n"
-            "    df_pixel = df_image_to_pixels(df, keys=[\"Target\", \"Mu\", \"Sigma\", \"Epsilon\"])\n"
-            "    df_pixel[\"Error\"] = np.abs(df_pixel[\"Mu\"] - df_pixel[\"Target\"])\n"
-            "    df_pixel[\"Entropy\"] = 0.5*np.log(2*np.pi*np.exp(1.)*(df_pixel[\"Sigma\"]**2))\n"
-            "    print (df_pixel[df_pixel[\"Method\"]==\"Laplace\"].head() )\n"
-            "    df_pixel[\"Entropy\"].mask(df_pixel[\"Method\"] == \"Laplace\", "
-            "np.log(2*df_pixel[\"Sigma\"]*np.exp(1.)), inplace=True)\n"
-            "    print (df_pixel[df_pixel[\"Method\"]==\"Laplace\"].head() )\n\n"
-            "    ### Plot epsilon vs error per method\n"
-            "    df = df_pixel.groupby([df_pixel.index, \"Method\", \"Model Path\", \"Epsilon\"]).mean().reset_index()\n"
-            "    df_by_method = df_pixel.groupby([\"Method\", \"Model Path\", \"Epsilon\"]).mean().reset_index()\n"
-            "    sns."
-        ),
-        "results": [
-            {
-                "model_key": "deepseek-coder-1.3b-instruct",
-                "method_label": "M0 \u00b7 Base (no RAG)",
-                "use_rag": False,
-                "rag_method": "none",
-                "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
-                "outcome": "untested",
-            },
-            {
-                "model_key": "deepseek-coder-1.3b-instruct",
-                "method_label": "M2 \u00b7 Intent-Extended RAG",
-                "use_rag": True,
-                "rag_method": "m2",
-                "intention": "Generate plots for adversarial robustness analysis.",
-                "context_used": (
-                    "Intent: \"Generate plots for adversarial robustness analysis.\"\n"
-                    "Replacement API: seaborn.lineplot\n"
-                    "Deprecated: ['seaborn.tsplot']"
-                ),
-                "completion": "[PLACEHOLDER \u2014 run live and paste actual output]",
-                "outcome": "untested",
-            },
-        ],
-        "notes": (
-            "Real D_test case with a long, realistic function body (research-code "
-            "style, not a toy example) \u2014 good stress test for whether retrieval "
-            "and generation still work cleanly on messier, real-world input rather "
-            "than clean textbook snippets."
         ),
     },
 

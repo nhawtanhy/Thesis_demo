@@ -1,12 +1,30 @@
 import json
 
-file_path = r"C:\Users\nhata\Downloads\Thesis_data\RAG\D_test.json"
+# Input file
+json_path = r"C:\Users\nhata\Desktop\Thesis_All\Data\D_Contrast\depAPI_contrastive_deepseek.json"
 
-with open(file_path, "r", encoding="utf-8") as f:
+# Load JSON
+with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-# Convert each dictionary to a hashable string
-unique_instances = {json.dumps(item, sort_keys=True) for item in data}
+# Collect unique mappings
+unique_pairs = set()
 
-print(f"Total instances: {len(data)}")
-print(f"Unique instances: {len(unique_instances)}")
+for item in data:
+    deprecated = item.get("deprecated api", [])
+    replacement = item.get("replacement api", "")
+
+    # Handle both list and string formats
+    if isinstance(deprecated, list):
+        for dep in deprecated:
+            unique_pairs.add((dep, replacement))
+    else:
+        unique_pairs.add((deprecated, replacement))
+
+# Sort alphabetically
+unique_pairs = sorted(unique_pairs)
+
+print(f"Total unique mappings: {len(unique_pairs)}\n")
+
+for dep, rep in unique_pairs:
+    print(f"{dep}  -->  {rep}")
