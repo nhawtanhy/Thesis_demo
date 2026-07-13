@@ -31,12 +31,15 @@
     <pre>{{ case.deprecated_snippet }}</pre>
   </div>
 
-  <div class="prompt-preview">
-    <div class="tab-row prompt-tabs">
-      <button class="tab-btn active" data-prompt-type="none">Prompt sent (No RAG)</button>
-      <button class="tab-btn" data-prompt-type="context">Prompt sent (With retrieved context)</button>
+  <div class="prompt-preview-grid">
+    <div class="prompt-preview-col">
+      <span class="snapshot-label">Prompt sent (No RAG)</span>
+      <pre class="prompt-preview-none"></pre>
     </div>
-    <pre class="prompt-preview-content"></pre>
+    <div class="prompt-preview-col">
+      <span class="snapshot-label">Prompt sent (With retrieved context)</span>
+      <pre class="prompt-preview-context"></pre>
+    </div>
   </div>
 
   <div class="snapshot-grid" style="grid-template-columns: repeat({{ case.results|length }}, 1fr);">

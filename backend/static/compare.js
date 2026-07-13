@@ -118,30 +118,12 @@ function setupPromptPreviews() {
       }
     }
 
-    const previewBox = caseEl.querySelector(".prompt-preview-content");
-    const promptTabs = caseEl.querySelectorAll(".prompt-tabs .tab-btn");
-    if (!previewBox) return;
+    const noneBox = caseEl.querySelector(".prompt-preview-none");
+    const contextBox = caseEl.querySelector(".prompt-preview-context");
 
-    // Default to the "no RAG" prompt
-    previewBox.textContent = noContextPrompt;
-
-    // If no RAG data exists for this case, disable the second tab
-    const contextTabBtn = caseEl.querySelector('.prompt-tabs .tab-btn[data-prompt-type="context"]');
-    if (!withContextPrompt && contextTabBtn) {
-      contextTabBtn.disabled = true;
-      contextTabBtn.title = "No RAG context available for this case";
-      contextTabBtn.style.opacity = "0.4";
-      contextTabBtn.style.cursor = "not-allowed";
+    if (noneBox) noneBox.textContent = noContextPrompt;
+    if (contextBox) {
+      contextBox.textContent = withContextPrompt || "\u2014 no RAG context available for this case \u2014";
     }
-
-    promptTabs.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (btn.disabled) return;
-        promptTabs.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        previewBox.textContent =
-          btn.dataset.promptType === "context" ? withContextPrompt : noContextPrompt;
-      });
-    });
   });
 }
