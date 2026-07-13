@@ -364,20 +364,14 @@ body.playground-body main.page{
 }
 
 /* ===================================================================
-   Compare page — screenshot-ready 5-method grid
+   Compare page — screenshot-ready static grid of pre-run results
    =================================================================== */
 
 .compare-header{ margin-bottom: 24px; }
 
-.compare-controls{
-  display:flex; flex-direction:column; gap:14px;
-  background:var(--panel); border:1px solid var(--border); border-radius:8px;
-  padding:20px; margin-bottom:28px;
-}
-
 .compare-snapshot{
   background:var(--panel); border:1px solid var(--border); border-radius:10px;
-  padding:28px;
+  padding:28px; margin-bottom:28px;
 }
 
 .snapshot-title{
@@ -399,13 +393,18 @@ body.playground-body main.page{
 }
 
 .snapshot-grid{
-  display:grid; grid-template-columns:repeat(5, 1fr); gap:14px;
+  display:grid; gap:14px;
 }
 
 .snapshot-col{
   background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
   padding:14px; display:flex; flex-direction:column; gap:10px; min-width:0;
+  border-top:3px solid var(--border);
 }
+.snapshot-col.outcome-border-deprecated{ border-top-color:var(--red); }
+.snapshot-col.outcome-border-replacement{ border-top-color:var(--teal); }
+.snapshot-col.outcome-border-other{ border-top-color:var(--text-dim); }
+.snapshot-col.outcome-border-untested{ border-top-color:var(--text-dim); }
 
 .snapshot-col-header{
   font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
@@ -427,10 +426,20 @@ body.playground-body main.page{
 .snapshot-context pre{ color:#8b919c; }
 .snapshot-output pre{ color:#d7cfa3; }
 
+.snapshot-outcome-badge{
+  font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600;
+  padding:4px 8px; border-radius:4px; text-align:center; margin-top:auto;
+}
+.snapshot-outcome-badge.outcome-deprecated{ background:rgba(217,104,95,0.15); color:var(--red); }
+.snapshot-outcome-badge.outcome-replacement{ background:rgba(95,184,168,0.15); color:var(--teal); }
+.snapshot-outcome-badge.outcome-other{ background:rgba(139,145,156,0.15); color:var(--text-dim); }
+.snapshot-outcome-badge.outcome-untested{ background:rgba(139,145,156,0.12); color:var(--text-dim); }
+
+.compare-notes{ margin-top:18px; }
+
 @media (max-width: 1100px){
-  .snapshot-grid{ grid-template-columns:repeat(3, 1fr); }
+  .snapshot-grid{ grid-template-columns:repeat(3, 1fr) !important; }
 }
 @media (max-width: 720px){
-  .snapshot-grid{ grid-template-columns:1fr; }
-  .compare-controls .form-row-inline{ flex-direction:column; }
+  .snapshot-grid{ grid-template-columns:1fr !important; }
 }
