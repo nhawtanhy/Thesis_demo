@@ -59,7 +59,16 @@ def home(request: Request):
 
 @app.get("/compare")
 def compare(request: Request):
-    return templates.TemplateResponse(request, "compare.html", {"active": "compare"})
+    return templates.TemplateResponse(
+        request,
+        "compare.html",
+        {
+            "active": "compare",
+            "examples": EXAMPLES,
+            "models": model_backend.MODEL_REGISTRY,
+        },
+    )
+ 
 
 @app.get("/analysis")
 def analysis(request: Request):
