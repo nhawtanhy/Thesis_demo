@@ -31,9 +31,19 @@
     <pre>{{ case.deprecated_snippet }}</pre>
   </div>
 
+  <div class="prompt-preview">
+    <div class="tab-row prompt-tabs">
+      <button class="tab-btn active" data-prompt-type="none">Prompt sent (No RAG)</button>
+      <button class="tab-btn" data-prompt-type="context">Prompt sent (With retrieved context)</button>
+    </div>
+    <pre class="prompt-preview-content"></pre>
+  </div>
+
   <div class="snapshot-grid" style="grid-template-columns: repeat({{ case.results|length }}, 1fr);">
     {% for r in case.results %}
-    <div class="snapshot-col outcome-border-{{ r.outcome }}">
+    <div class="snapshot-col outcome-border-{{ r.outcome }}"
+         data-rag-method="{{ r.rag_method if r.rag_method else 'none' }}"
+         data-is-instruct="{{ 'true' if r.model_key in models and models[r.model_key].is_instruct else 'false' }}">
       <div class="snapshot-col-header">
         {{ r.method_label if r.method_label else (models[r.model_key].label if r.model_key in models else r.model_key) }}
       </div>
