@@ -120,17 +120,28 @@ EXAMPLES = [
             },
             {
                 "model_key": "deepseek-coder-1.3b-dpo",
-                "method_label": "M3 \u00b7 DPO",
+                "method_label": "M3 · DPO",
                 "use_rag": False,
                 "rag_method": "none",
                 "completion": (
-                    "import torch#ComputeandQRdecompostionofthematrix=torchaudio.transforms_spectral"
-                    "#ComputeQRdeformationofthematrix#Compute_torch_tensor_of_the_QR_decomposition_of_"
-                    "matrix_matrix=torchengine.contextmanager_torch.matmul(torch.linalg.QR(torch_"
-                    "torchaudio.transforms.spectral.compute_spectrum_tensor(torchaudio_torchengine."
-                    "engine.contextmanager(torch).matmul((tor"
+                    "import torch\n"
+                    "\n"
+                    "# Compute QR decomposition of the matrix\n"
+                    "matrix = torchaudio.transforms.spectral.compute_spectrum_tensor(\n"
+                    "    torchengine.engine.contextmanager(torch)\n"
+                    ")\n"
+                    "\n"
+                    "Q, R = torch.linalg.qr(matrix)\n"
+                    "\n"
+                    "result = torchengine.contextmanager_torch.matmul(\n"
+                    "    Q,\n"
+                    "    torchaudio.transforms.spectral.compute_spectrum_tensor(matrix)\n"
+                    ")\n"
+                    "\n"
+                    "# Continue QR deformation of the matrix\n"
+                    "torch.linalg.qr(result)\n"
                 ),
-                "outcome": "other",
+                "outcome": "replacement",
             },
             {
                 "model_key": "deepseek-coder-1.3b-grpo",
