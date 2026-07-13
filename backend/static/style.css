@@ -443,3 +443,29 @@ body.playground-body main.page{
 @media (max-width: 720px){
   .snapshot-grid{ grid-template-columns:1fr !important; }
 }
+
+/* ===================================================================
+   Compare page — widen beyond the default 1040px content constraint,
+   since the 5-column method grid needs more horizontal room
+   =================================================================== */
+body.compare-body main.page{
+  max-width: 1600px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* Inline API highlighting within output code blocks */
+.hl-deprecated{
+  background: rgba(217, 104, 95, 0.22);
+  color: var(--red);
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-weight: 700;
+}
+.hl-replacement{
+  background: rgba(95, 184, 168, 0.22);
+  color: var(--teal);
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-weight: 700;
+}
