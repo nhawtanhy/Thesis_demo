@@ -362,3 +362,75 @@ body.playground-body main.page{
   white-space:pre-wrap; word-break:break-word; color:#8b919c; background:transparent;
   border:none; padding:0;
 }
+
+/* ===================================================================
+   Compare page — screenshot-ready 5-method grid
+   =================================================================== */
+
+.compare-header{ margin-bottom: 24px; }
+
+.compare-controls{
+  display:flex; flex-direction:column; gap:14px;
+  background:var(--panel); border:1px solid var(--border); border-radius:8px;
+  padding:20px; margin-bottom:28px;
+}
+
+.compare-snapshot{
+  background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  padding:28px;
+}
+
+.snapshot-title{
+  font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700;
+  color:var(--amber); margin-bottom:18px;
+}
+
+.snapshot-input{ margin-bottom:22px; }
+.snapshot-label{
+  display:block; font-family:'JetBrains Mono',monospace; font-size:11px;
+  text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim);
+  margin-bottom:8px;
+}
+.snapshot-input pre{
+  background:#0e0f12; border:1px solid var(--border); border-radius:6px;
+  padding:14px; font-family:'JetBrains Mono',monospace; font-size:13px;
+  line-height:1.6; white-space:pre-wrap; word-break:break-word;
+  margin:0; color:#d7cfa3;
+}
+
+.snapshot-grid{
+  display:grid; grid-template-columns:repeat(5, 1fr); gap:14px;
+}
+
+.snapshot-col{
+  background:var(--panel-2); border:1px solid var(--border); border-radius:8px;
+  padding:14px; display:flex; flex-direction:column; gap:10px; min-width:0;
+}
+
+.snapshot-col-header{
+  font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
+  color:var(--amber); border-bottom:1px solid var(--border); padding-bottom:8px;
+}
+
+.snapshot-sublabel{
+  display:block; font-family:'JetBrains Mono',monospace; font-size:10px;
+  text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim);
+  margin-bottom:5px;
+}
+
+.snapshot-context pre, .snapshot-output pre{
+  background:#0e0f12; border:1px solid var(--border); border-radius:5px;
+  padding:9px; font-family:'JetBrains Mono',monospace; font-size:11px;
+  line-height:1.5; white-space:pre-wrap; word-break:break-word;
+  margin:0; max-height:260px; overflow-y:auto;
+}
+.snapshot-context pre{ color:#8b919c; }
+.snapshot-output pre{ color:#d7cfa3; }
+
+@media (max-width: 1100px){
+  .snapshot-grid{ grid-template-columns:repeat(3, 1fr); }
+}
+@media (max-width: 720px){
+  .snapshot-grid{ grid-template-columns:1fr; }
+  .compare-controls .form-row-inline{ flex-direction:column; }
+}

@@ -57,6 +57,9 @@ class CompletionResponse(BaseModel):
 def home(request: Request):
     return templates.TemplateResponse(request, "home.html", {"active": "home"})
 
+@app.get("/compare")
+def compare(request: Request):
+    return templates.TemplateResponse(request, "compare.html", {"active": "compare"})
 
 @app.get("/analysis")
 def analysis(request: Request):

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Compare — DUR Completion{% endblock %}
+{% block content %}
+
+<section class="page-header compare-header">
+  <h1>Method comparison</h1>
+  <p class="lede">
+    Run one input through all 5 methods and see input, retrieved context, and
+    output side by side &mdash; built for capturing a clean screenshot for slides.
+  </p>
+</section>
+
+<section class="compare-controls" id="compareControls">
+  <div class="form-row">
+    <label for="cmpTitle">Title (shown above the snapshot)</label>
+    <input type="text" id="cmpTitle" placeholder="e.g. numpy.product \u2192 numpy.prod">
+  </div>
+
+  <div class="form-row">
+    <label for="cmpSnippet">Code (cursor position = end of text)</label>
+    <textarea id="cmpSnippet" rows="6" placeholder="import numpy as np&#10;arr = np.array([2, 3, 4, 5])&#10;result = np."></textarea>
+  </div>
+
+  <div class="form-row form-row-inline">
+    <div>
+      <label for="cmpFamily">Model family</label>
+      <select id="cmpFamily">
+        <option value="deepseek-coder-1.3b">DeepSeek-Coder 1.3B (instruct)</option>
+        <option value="codegen-2b">CodeGen 2B (base)</option>
+      </select>
+    </div>
+    <div>
+      <label for="cmpIntention">M2 intent (optional &mdash; auto-generates if blank, ~10s)</label>
+      <input type="text" id="cmpIntention" placeholder="e.g. Compute the product of all elements">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <button type="button" id="cmpRunBtn" class="btn-primary" style="border:none;cursor:pointer;">Run all 5 methods</button>
+    <span id="cmpStatus" class="hint" style="margin-left:12px;"></span>
+    <button type="button" id="cmpToggleControls" class="btn-secondary" style="margin-left:12px;display:none;">Hide controls before screenshot</button>
+  </div>
+</section>
+
+<section class="compare-snapshot" id="compareSnapshot" style="display:none;">
+  <div class="snapshot-title" id="snapshotTitle"></div>
+
+  <div class="snapshot-input">
+    <span class="snapshot-label">Input</span>
+    <pre id="snapshotInput"></pre>
+  </div>
+
+  <div class="snapshot-grid" id="snapshotGrid">
+    <!-- 5 method columns injected here -->
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/compare.js"></script>
+{% endblock %}
